@@ -13,4 +13,12 @@ const project = new awscdk.AwsCdkConstructLibrary({
   projenrcTs: true,
   repositoryUrl: 'https://github.com/robhan/aws_grafana.git',
 });
+
+const releaseWorkflow = project.github?.tryFindWorkflow('release');
+
+releaseWorkflow?.file!.addOverride(
+  'jobs.release_npm.env.NPM_ACCESS_LEVEL',
+  'public',
+);
+
 project.synth();
