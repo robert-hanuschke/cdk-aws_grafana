@@ -11,7 +11,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   name: 'aws_grafana',
   packageName: '@robhan-cdk-lib/aws_grafana',
   projenrcTs: true,
-  repositoryUrl: 'https://github.com/robhan/aws_grafana.git',
+  repositoryUrl: 'https://github.com/robert-hanuschke/cdk-aws_grafana',
 });
 
 const releaseWorkflow = project.github?.tryFindWorkflow('release');
