@@ -1,17 +1,16 @@
 import { awscdk } from 'projen';
 const project = new awscdk.AwsCdkConstructLibrary({
   author: 'Robert Hanuschke',
-  authorAddress: 'robhan@amazon.com',
-  cdkVersion: '2.1.0',
+  authorAddress: 'robhan@amazon.de',
+  cdkVersion: '2.198.0',
   defaultReleaseBranch: 'main',
+  description: 'AWS CDK Construct Library for Grafana',
   jsiiVersion: '~5.8.0',
+  keywords: ['grafana'],
+  license: 'MIT',
   name: 'aws_grafana',
+  packageName: '@robhan-cdk-lib/aws_grafana',
   projenrcTs: true,
   repositoryUrl: 'https://github.com/robhan/aws_grafana.git',
-
-  // deps: [],                /* Runtime dependencies of this module. */
-  // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
-  // devDeps: [],             /* Build dependencies for this module. */
-  // packageName: undefined,  /* The "name" in package.json. */
 });
 project.synth();

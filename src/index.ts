@@ -1,5 +1,16 @@
-export class Hello {
-  public sayHello() {
-    return 'hello, world!';
-  }
-}
+export {
+  AccountAccessType,
+  AuthenticationProviders,
+  NetworkAccessControl,
+  NotificationDestinations,
+  PermissionTypes,
+  SamlAssertionAttributes,
+  SamlConfiguration,
+  SamlConfigurationStatuses,
+  SamlIdpMetadata,
+  SamlRoleValues,
+  Status,
+  VpcConfiguration,
+  Workspace,
+  WorkspaceProps,
+} from './workspace';
