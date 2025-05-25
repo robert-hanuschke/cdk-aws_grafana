@@ -262,58 +262,77 @@ export interface VpcConfiguration {
  */
 export interface WorkspaceProps {
   /**
-   * Type of account access for the workspace.
+   * Specifies whether the workspace can access AWS resources in this AWS account only, or whether
+   * it can also access AWS resources in other accounts in the same organization. If this is
+   * ORGANIZATION, the OrganizationalUnits parameter specifies which organizational units the
+   * workspace can access.
+   *
    * Required field.
    */
   readonly accountAccessType: AccountAccessType;
 
   /**
-   * Authentication providers to enable for the workspace.
+   * Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to
+   * authenticate users for using the Grafana console within a workspace.
+   *
    * Required field.
    */
   readonly authenticationProviders: AuthenticationProviders[];
 
   /**
-   * Client token for idempotent workspace creation.
+   * A unique, case-sensitive, user-provided identifier to ensure the idempotency of the request.
+   *
    * Must be 1-64 characters long and contain only printable ASCII characters.
    */
   readonly clientToken?: string;
 
   /**
-   * List of data sources to enable for the workspace.
+   * Specifies the AWS data sources that have been configured to have IAM roles and permissions
+   * created to allow Amazon Managed Grafana to read data from these sources.
+   * This list is only used when the workspace was created through the AWS console, and the
+   * permissionType is SERVICE_MANAGED.
    */
   readonly dataSources?: string[];
 
   /**
-   * Description of the workspace.
+   * The user-defined description of the workspace.
+   *
    * Maximum length of 2048 characters.
    */
   readonly description?: string;
 
   /**
-   * Grafana version for the workspace.
+   * Specifies the version of Grafana to support in the workspace. Defaults to the latest version
+   * on create (for example, 9.4), or the current version of the workspace on update.
+   * Can only be used to upgrade (for example, from 8.4 to 9.4), not downgrade (for example, from
+   * 9.4 to 8.4).
+   *
    * Must be 1-255 characters long.
    */
   readonly grafanaVersion?: string;
 
   /**
-   * Name of the workspace.
-   * Must be 1-255 characters long and contain only alphanumeric characters, hyphens, dots, underscores, and tildes.
+   * The name of the workspace.
+   *
+   * Must be 1-255 characters long and contain only alphanumeric characters, hyphens, dots,
+   * underscores, and tildes.
    */
   readonly name?: string;
 
   /**
-   * Network access control configuration for the workspace.
+   * The configuration settings for network access to your workspace.
    */
   readonly networkAccessControl?: NetworkAccessControl;
 
   /**
-   * Notification destinations to enable for the workspace.
+   * The AWS notification channels that Amazon Managed Grafana can automatically create IAM roles
+   * and permissions for, to allow Amazon Managed Grafana to use these channels.
    */
   readonly notificationDestinations?: NotificationDestinations[];
 
   /**
-   * List of organizational units to include in the workspace.
+   * Specifies the organizational units that this workspace is allowed to use data sources from, if
+   * this workspace is in an account that is part of an organization.
    */
   readonly organizationalUnits?: string[];
 
@@ -324,34 +343,52 @@ export interface WorkspaceProps {
   readonly organizationRoleName?: string;
 
   /**
-   * Permission type for the workspace.
+   * If this is SERVICE_MANAGED, and the workplace was created through the Amazon Managed Grafana
+   * console, then Amazon Managed Grafana automatically creates the IAM roles and provisions the
+   * permissions that the workspace needs to use AWS data sources and notification channels.
+   *
+   * If this is CUSTOMER_MANAGED, you must manage those roles and permissions yourself.
+   *
+   * If you are working with a workspace in a member account of an organization and that account is
+   * not a delegated administrator account, and you want the workspace to access data sources in
+   * other AWS accounts in the organization, this parameter must be set to CUSTOMER_MANAGED.
+   *
    * Required field.
    */
   readonly permissionType: PermissionTypes;
 
   /**
-   * Whether to enable the Grafana plugin admin page.
+   * Whether plugin administration is enabled in the workspace. Setting to true allows workspace
+   * admins to install, uninstall, and update plugins from within the Grafana workspace.
+   *
+   * This option is only valid for workspaces that support Grafana version 9 or newer.
+   *
    * Default: false
    */
   readonly pluginAdminEnabled?: boolean;
 
   /**
-   * IAM role to use for the workspace.
+   * The IAM role that grants permissions to the AWS resources that the workspace will view data
+   * from.
    */
   readonly role?: IRole;
 
   /**
-   * SAML configuration for the workspace.
+   * If the workspace uses SAML, use this structure to map SAML assertion attributes to workspace
+   * user information and define which groups in the assertion attribute are to have the Admin and
+   * Editor roles in the workspace.
    */
   readonly samlConfiguration?: SamlConfiguration;
 
   /**
-   * Name of the CloudFormation stack set to use.
+   * The name of the AWS CloudFormation stack set that is used to generate IAM roles to be used for
+   * this workspace.
    */
   readonly stackSetName?: string;
 
   /**
-   * VPC configuration for the workspace.
+   * The configuration settings for an Amazon VPC that contains data sources for your Grafana
+   * workspace to connect to.
    */
   readonly vpcConfiguration?: VpcConfiguration;
 }
@@ -432,10 +469,9 @@ export enum Status {
 }
 
 /**
- * Represents an Amazon Managed Grafana workspace.
- *
- * This class provides a high-level abstraction for creating and managing
- * Amazon Managed Grafana workspaces using AWS CDK.
+ * Specifies a workspace. In a workspace, you can create Grafana dashboards and visualizations to
+ * analyze your metrics, logs, and traces. You don't have to build, package, or deploy any hardware
+ * to run the Grafana server.
  */
 export class Workspace extends Construct {
   /**
@@ -1016,82 +1052,108 @@ export class Workspace extends Construct {
   }
 
   /**
-   * The type of account access for the workspace.
+   * Specifies whether the workspace can access AWS resources in this AWS account only, or whether
+   * it can also access AWS resources in other accounts in the same organization. If this is
+   * ORGANIZATION, the OrganizationalUnits parameter specifies which organizational units the
+   * workspace can access.
    */
   public readonly accountAccessType: AccountAccessType;
 
   /**
-   * Authentication providers enabled for the workspace.
+   * Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to
+   * authenticate users for using the Grafana console within a workspace.
    */
   public readonly authenticationProviders: AuthenticationProviders[];
 
   /**
-   * Client token used for idempotent workspace creation.
+   * A unique, case-sensitive, user-provided identifier to ensure the idempotency of the request.
    */
   public readonly clientToken?: string;
 
   /**
-   * Data sources enabled for the workspace.
+   * Specifies the AWS data sources that have been configured to have IAM roles and permissions
+   * created to allow Amazon Managed Grafana to read data from these sources.
+   *
+   * This list is only used when the workspace was created through the AWS console, and the
+   * permissionType is SERVICE_MANAGED.
    */
   public readonly dataSources?: string[];
 
   /**
-   * Description of the workspace.
+   * The user-defined description of the workspace.
    */
   public readonly description?: string;
 
   /**
-   * Name of the workspace.
+   * The name of the workspace.
    */
   public readonly name?: string;
 
   /**
-   * Network access control configuration for the workspace.
+   * The configuration settings for network access to your workspace.
    */
   public readonly networkAccessControl?: NetworkAccessControl;
 
   /**
-   * Notification destinations enabled for the workspace.
+   * The AWS notification channels that Amazon Managed Grafana can automatically create IAM roles
+   * and permissions for, to allow Amazon Managed Grafana to use these channels.
    */
   public readonly notificationDestinations?: NotificationDestinations[];
 
   /**
-   * Organizational units included in the workspace.
+   * Specifies the organizational units that this workspace is allowed to use data sources from, if
+   * this workspace is in an account that is part of an organization.
    */
   public readonly organizationalUnits?: string[];
 
   /**
-   * Name of the IAM role used for the organization.
+   * The name of the IAM role that is used to access resources through Organizations.
    */
   public readonly organizationRoleName?: string;
 
   /**
-   * Permission type for the workspace.
+   * If this is SERVICE_MANAGED, and the workplace was created through the Amazon Managed Grafana
+   * console, then Amazon Managed Grafana automatically creates the IAM roles and provisions the
+   * permissions that the workspace needs to use AWS data sources and notification channels.
+   *
+   * If this is CUSTOMER_MANAGED, you must manage those roles and permissions yourself.
+   *
+   * If you are working with a workspace in a member account of an organization and that account is
+   * not a delegated administrator account, and you want the workspace to access data sources in
+   * other AWS accounts in the organization, this parameter must be set to CUSTOMER_MANAGED.
    */
   public readonly permissionType: PermissionTypes;
 
   /**
-   * Whether the Grafana plugin admin page is enabled.
+   * Whether plugin administration is enabled in the workspace. Setting to true allows workspace
+   * admins to install, uninstall, and update plugins from within the Grafana workspace.
+   *
+   * This option is only valid for workspaces that support Grafana version 9 or newer.
    */
   public readonly pluginAdminEnabled?: boolean;
 
   /**
-   * IAM role used for the workspace.
+   * The IAM role that grants permissions to the AWS resources that the workspace will view data
+   * from.
    */
   public readonly role?: IRole;
 
   /**
-   * SAML configuration for the workspace.
+   * If the workspace uses SAML, use this structure to map SAML assertion attributes to workspace
+   * user information and define which groups in the assertion attribute are to have the Admin and
+   * Editor roles in the workspace.
    */
   public readonly samlConfiguration?: SamlConfiguration;
 
   /**
-   * Name of the CloudFormation stack set used.
+   * The name of the AWS CloudFormation stack set that is used to generate IAM roles to be used for
+   * this workspace.
    */
   public readonly stackSetName?: string;
 
   /**
-   * VPC configuration for the workspace.
+   * The configuration settings for an Amazon VPC that contains data sources for your Grafana
+   * workspace to connect to.
    */
   public readonly vpcConfiguration?: VpcConfiguration;
 
@@ -1101,54 +1163,46 @@ export class Workspace extends Construct {
   private readonly workspace: CfnWorkspace;
 
   /**
-   * Timestamp when the workspace was created.
+   * The date that the workspace was created.
    */
   public readonly creationTimestamp: string;
 
   /**
-   * Endpoint URL for the Grafana workspace.
+   * The URL that users can use to access the Grafana console in the workspace.
    */
   public readonly endpoint: string;
 
   /**
-   * Grafana version running in the workspace.
+   * Specifies the version of Grafana supported by this workspace.
    */
   public readonly grafanaVersion: string;
 
   /**
-   * Unique identifier for the workspace.
+   * The unique ID of this workspace.
    */
   public readonly id: string;
 
   /**
-   * Timestamp when the workspace was last modified.
+   * The most recent date that the workspace was modified.
    */
   public readonly modificationTimestamp: string;
 
   /**
-   * Status of SAML configuration for the workspace.
+   * Specifies whether the workspace's SAML configuration is complete.
    */
   public readonly samlConfigurationStatus: SamlConfigurationStatuses;
 
   /**
-   * SSO client ID for the workspace.
+   * The ID of the IAM Identity Center-managed application that is created by Amazon Managed
+   * Grafana.
    */
   public readonly ssoClientId: string;
 
   /**
-   * Current status of the workspace.
+   * The current status of the workspace.
    */
   public readonly status: Status;
 
-  /**
-   * Creates a new Amazon Managed Grafana workspace.
-   *
-   * @param scope - The scope in which to define this construct
-   * @param id - The scoped construct ID
-   * @param props - Configuration properties for the workspace
-   *
-   * @throws Error if any of the provided properties fail validation
-   */
   constructor(scope: Construct, id: string, props: WorkspaceProps) {
     super(scope, id);
 
