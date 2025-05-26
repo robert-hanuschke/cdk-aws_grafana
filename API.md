@@ -525,7 +525,7 @@ const samlAssertionAttributes: SamlAssertionAttributes = { ... }
 
 ---
 
-##### `email`<sup>Required</sup> <a name="email" id="@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes.property.email"></a>
+##### `email`<sup>Optional</sup> <a name="email" id="@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes.property.email"></a>
 
 ```typescript
 public readonly email: string;
@@ -539,7 +539,7 @@ Must be between 1 and 256 characters long.
 
 ---
 
-##### `groups`<sup>Required</sup> <a name="groups" id="@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes.property.groups"></a>
+##### `groups`<sup>Optional</sup> <a name="groups" id="@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes.property.groups"></a>
 
 ```typescript
 public readonly groups: string;
@@ -553,7 +553,7 @@ Must be between 1 and 256 characters long.
 
 ---
 
-##### `login`<sup>Required</sup> <a name="login" id="@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes.property.login"></a>
+##### `login`<sup>Optional</sup> <a name="login" id="@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes.property.login"></a>
 
 ```typescript
 public readonly login: string;
@@ -567,7 +567,7 @@ Must be between 1 and 256 characters long.
 
 ---
 
-##### `name`<sup>Required</sup> <a name="name" id="@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes.property.name"></a>
+##### `name`<sup>Optional</sup> <a name="name" id="@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes.property.name"></a>
 
 ```typescript
 public readonly name: string;
@@ -581,7 +581,7 @@ Must be between 1 and 256 characters long.
 
 ---
 
-##### `org`<sup>Required</sup> <a name="org" id="@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes.property.org"></a>
+##### `org`<sup>Optional</sup> <a name="org" id="@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes.property.org"></a>
 
 ```typescript
 public readonly org: string;
@@ -595,7 +595,7 @@ Must be between 1 and 256 characters long.
 
 ---
 
-##### `role`<sup>Required</sup> <a name="role" id="@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes.property.role"></a>
+##### `role`<sup>Optional</sup> <a name="role" id="@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes.property.role"></a>
 
 ```typescript
 public readonly role: string;
