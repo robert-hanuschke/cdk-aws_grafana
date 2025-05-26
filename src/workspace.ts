@@ -488,10 +488,6 @@ export class Workspace extends Construct {
   private static validateClientToken(token: unknown): string[] {
     const errors: string[] = [];
 
-    if (token === undefined) {
-      return errors; // Optional property can be undefined
-    }
-
     if (typeof token !== 'string') {
       errors.push('clientToken must be a string');
       return errors; // No need to check further if not a string
@@ -524,10 +520,6 @@ export class Workspace extends Construct {
   private static validateDescription(description: unknown): string[] {
     const errors: string[] = [];
 
-    if (description === undefined) {
-      return errors; // Optional property can be undefined
-    }
-
     if (typeof description !== 'string') {
       errors.push('description must be a string');
       return errors; // No need to check further if not a string
@@ -552,10 +544,6 @@ export class Workspace extends Construct {
    */
   private static validateGrafanaVersion(version: unknown): string[] {
     const errors: string[] = [];
-
-    if (version === undefined) {
-      return errors; // Optional property can be undefined
-    }
 
     if (typeof version !== 'string') {
       errors.push('grafanaVersion must be a string');
@@ -586,10 +574,6 @@ export class Workspace extends Construct {
    */
   private static validateName(name: unknown): string[] {
     const errors: string[] = [];
-
-    if (name === undefined) {
-      return errors; // Optional property can be undefined
-    }
 
     if (typeof name !== 'string') {
       errors.push('name must be a string');
@@ -625,10 +609,6 @@ export class Workspace extends Construct {
    */
   private static validateNetworkAccessControl(nac: unknown): string[] {
     const errors: string[] = [];
-
-    if (nac === undefined) {
-      return errors; // Optional property can be undefined
-    }
 
     if (!nac || typeof nac !== 'object') {
       errors.push('networkAccessControl must be an object');
@@ -670,10 +650,6 @@ export class Workspace extends Construct {
    */
   private static validateOrganizationRoleName(roleName: unknown): string[] {
     const errors: string[] = [];
-
-    if (roleName === undefined) {
-      return errors; // Optional property can be undefined
-    }
 
     if (typeof roleName !== 'string') {
       errors.push('organizationRoleName must be a string');
@@ -788,10 +764,6 @@ export class Workspace extends Construct {
   private static validateSamlConfiguration(config: unknown): string[] {
     const errors: string[] = [];
 
-    if (config === undefined) {
-      return errors; // Optional property can be undefined
-    }
-
     if (!config || typeof config !== 'object') {
       errors.push('samlConfiguration must be an object');
       return errors;
@@ -870,6 +842,12 @@ export class Workspace extends Construct {
                 errors.push(`roleValues.admin[${i}] must be a string`);
               }
             }
+
+            if (samlConfig.roleValues.admin.length > 256) {
+              errors.push(
+                'roleValues.admin cannot have more than 256 elements',
+              );
+            }
           }
         }
 
@@ -882,6 +860,12 @@ export class Workspace extends Construct {
               if (typeof samlConfig.roleValues.editor[i] !== 'string') {
                 errors.push(`roleValues.editor[${i}] must be a string`);
               }
+            }
+
+            if (samlConfig.roleValues.editor.length > 256) {
+              errors.push(
+                'roleValues.editor cannot have more than 256 elements',
+              );
             }
           }
         }
@@ -904,10 +888,6 @@ export class Workspace extends Construct {
    */
   private static validateVpcConfiguration(config: unknown): string[] {
     const errors: string[] = [];
-
-    if (config === undefined) {
-      return errors; // Optional property can be undefined
-    }
 
     if (!config || typeof config !== 'object') {
       errors.push('vpcConfiguration must be an object');
@@ -1207,17 +1187,18 @@ export class Workspace extends Construct {
     super(scope, id);
 
     const errors = Workspace.validateProps(props);
-    if (errors.length > 0) {
-      throw new Error(`Invalid props:\n${errors.join('\n')}`);
-    }
 
     if (
       props.accountAccessType === AccountAccessType.CURRENT_ACCOUNT &&
       !props.role
     ) {
-      throw new Error(
+      errors.push(
         'Role must be provided when accountAccessType is CURRENT_ACCOUNT',
       );
+    }
+
+    if (errors.length > 0) {
+      throw new Error(`Invalid props:\n${errors.join('\n')}`);
     }
 
     this.accountAccessType = props.accountAccessType;
