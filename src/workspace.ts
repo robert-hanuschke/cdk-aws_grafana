@@ -115,40 +115,40 @@ export interface SamlAssertionAttributes {
    *
    * Must be between 1 and 256 characters long.
    */
-  readonly email: string;
+  readonly email?: string;
   /**
    * The name of the attribute within the SAML assertion to use as the user full "friendly" names
    * for user groups.
    *
    * Must be between 1 and 256 characters long.
    */
-  readonly groups: string;
+  readonly groups?: string;
   /**
    * The name of the attribute within the SAML assertion to use as the login names for SAML users.
    *
    * Must be between 1 and 256 characters long.
    */
-  readonly login: string;
+  readonly login?: string;
   /**
    * The name of the attribute within the SAML assertion to use as the user full "friendly" names
    * for SAML users.
    *
    * Must be between 1 and 256 characters long.
    */
-  readonly name: string;
+  readonly name?: string;
   /**
    * The name of the attribute within the SAML assertion to use as the user full "friendly" names
    * for the users' organizations.
    *
    * Must be between 1 and 256 characters long.
    */
-  readonly org: string;
+  readonly org?: string;
   /**
    * The name of the attribute within the SAML assertion to use as the user roles.
    *
    * Must be between 1 and 256 characters long.
    */
-  readonly role: string;
+  readonly role?: string;
 }
 
 /**
