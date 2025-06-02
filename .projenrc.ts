@@ -2,6 +2,11 @@ import { awscdk } from 'projen';
 const project = new awscdk.AwsCdkConstructLibrary({
   author: 'Robert Hanuschke',
   authorAddress: 'robhan@amazon.de',
+  autoApproveOptions: {
+    allowedUsernames: ['robert-hanuschke'],
+    secret: 'PROJEN_GITHUB_TOKEN',
+  },
+  autoApproveUpgrades: true,
   cdkVersion: '2.198.0',
   defaultReleaseBranch: 'main',
   description: 'AWS CDK Construct Library for Grafana',
