@@ -4,7 +4,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   authorAddress: 'robhan@amazon.de',
   autoApproveOptions: {
     allowedUsernames: ['robert-hanuschke'],
-    secret: 'PROJEN_GITHUB_TOKEN',
+    secret: 'GITHUB_TOKEN',
   },
   autoApproveUpgrades: true,
   cdkVersion: '2.198.0',
