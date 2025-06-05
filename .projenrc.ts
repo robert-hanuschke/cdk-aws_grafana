@@ -9,6 +9,11 @@ const project = new awscdk.AwsCdkConstructLibrary({
   autoApproveUpgrades: true,
   cdkVersion: '2.198.0',
   defaultReleaseBranch: 'main',
+  depsUpgradeOptions: {
+    workflowOptions: {
+      labels: ['auto-approve', 'auto-merge'],
+    }
+  },
   description: 'AWS CDK Construct Library for Grafana',
   jsiiVersion: '~5.8.0',
   keywords: ['grafana'],
