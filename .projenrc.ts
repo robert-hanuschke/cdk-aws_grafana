@@ -12,7 +12,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   depsUpgradeOptions: {
     workflowOptions: {
       labels: ['auto-approve', 'auto-merge'],
-    }
+    },
   },
   description: 'AWS CDK Construct Library for Grafana',
   jsiiVersion: '~5.8.0',
