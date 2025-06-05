@@ -1568,9 +1568,9 @@ camelcase@^6.2.0, camelcase@^6.3.0:
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
 caniuse-lite@^1.0.30001718:
-  version "1.0.30001720"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001720.tgz#c138cb6026d362be9d8d7b0e4bcd0183a850edfd"
-  integrity sha512-Ec/2yV2nNPwb4DnTANEV99ZWwm3ZWfdlfkQbWSDDt+PsXEVYwlhPH8tdMaPunYTKKmz7AnHi2oNEi1GcmKCD8g==
+  version "1.0.30001721"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001721.tgz#36b90cd96901f8c98dd6698bf5c8af7d4c6872d7"
+  integrity sha512-cOuvmUVtKrtEaoKiO0rSc29jcjwMwX5tOHDy4MgVFEWiUXj4uBMJkwI8MDySkgXidpMiHUcviogAvFi4pA2hDQ==
 
 case@1.6.3, case@^1.6.3:
   version "1.6.3"
@@ -2146,9 +2146,9 @@ ejs@^3.1.10:
     jake "^10.8.5"
 
 electron-to-chromium@^1.5.160:
-  version "1.5.162"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.162.tgz#5305c15292a960f36e86f8b330da958f8ae1690d"
-  integrity sha512-hQA+Zb5QQwoSaXJWEAGEw1zhk//O7qDzib05Z4qTqZfNju/FAkrm5ZInp0JbTp4Z18A6bilopdZWEYrFSsfllA==
+  version "1.5.165"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.165.tgz#477b0957e42f071905a86f7c905a9848f95d2bdb"
+  integrity sha512-naiMx1Z6Nb2TxPU6fiFrUrDTjyPMLdTtaOd2oLmG8zVSg2hCWGkhPyxwk+qRmZ1ytwVqUv0u7ZcDA5+ALhaUtw==
 
 emittery@^0.13.1:
   version "0.13.1"
@@ -2308,12 +2308,12 @@ escape-string-regexp@^4.0.0:
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
 
 eslint-import-context@^0.1.5:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/eslint-import-context/-/eslint-import-context-0.1.6.tgz#42dcd6718beea6279a78015e347d82a1c75f0dfa"
-  integrity sha512-/e2ZNPDLCrU8niIy0pddcvXuoO2YrKjf3NAIX+60mHJBT4yv7mqCqvVdyCW2E720e25e4S/1OSVef4U6efGLFg==
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/eslint-import-context/-/eslint-import-context-0.1.7.tgz#dbdc87826fa10be3a76a85d77de72dc645c12325"
+  integrity sha512-gRkcGvLn+lYEBmv8OSzHciuS0Py6MPd0EEb112C1iHOgvrbnaveqL/f3nEccqHuN8+jGDVOADu0JCMrikCgm3w==
   dependencies:
     get-tsconfig "^4.10.1"
-    stable-hash "^0.0.5"
+    stable-hash "^0.0.6"
 
 eslint-import-resolver-node@^0.3.9:
   version "0.3.9"
@@ -5174,6 +5174,11 @@ stable-hash@^0.0.5:
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/stable-hash/-/stable-hash-0.0.5.tgz#94e8837aaeac5b4d0f631d2972adef2924b40269"
   integrity sha512-+L3ccpzibovGXFK+Ap/f8LOS0ahMrHTf3xu7mMLSpEGU0EO9ucaysSylKo9eRDFNhWve/y275iPmIZ4z39a9iA==
+
+stable-hash@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/stable-hash/-/stable-hash-0.0.6.tgz#7dd2cb7c71c2526b0d089b6bf0d1fcef38a6f97e"
+  integrity sha512-0afH4mobqTybYZsXImQRLOjHV4gvOW+92HdUIax9t7a8d9v54KWykEuMVIcXhD9BCi+w3kS4x7O6fmZQ3JlG/g==
 
 stack-utils@^2.0.3:
   version "2.0.6"
