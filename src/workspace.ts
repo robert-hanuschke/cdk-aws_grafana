@@ -1,261 +1,19 @@
-import {
-  IPrefixList,
-  ISecurityGroup,
-  ISubnet,
-  IVpcEndpoint,
-} from 'aws-cdk-lib/aws-ec2';
 import { CfnWorkspace, CfnWorkspaceProps } from 'aws-cdk-lib/aws-grafana';
 import { IRole } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
-
-/**
- * Specifies whether the workspace can access AWS resources in this AWS account only, or whether it
- * can also access AWS resources in other accounts in the same organization. If this is
- * ORGANIZATION, the OrganizationalUnits parameter specifies which organizational units the
- * workspace can access.
- */
-export enum AccountAccessType {
-  /**
-   * Access is limited to the current AWS account only.
-   */
-  CURRENT_ACCOUNT = 'CURRENT_ACCOUNT',
-
-  /**
-   * Access is extended to the entire AWS organization.
-   */
-  ORGANIZATION = 'ORGANIZATION',
-}
-
-/**
- * Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to authenticate
- * users for using the Grafana console within a workspace.
- *
- * @see https://docs.aws.amazon.com/grafana/latest/APIReference/API_CreateWorkspace.html
- */
-export enum AuthenticationProviders {
-  /**
-   * AWS Single Sign-On authentication provider.
-   */
-  AWS_SSO = 'AWS_SSO',
-
-  /**
-   * Security Assertion Markup Language (SAML) authentication provider.
-   */
-  SAML = 'SAML',
-}
-
-/**
- * The configuration settings for network access to your workspace.
- */
-export interface NetworkAccessControl {
-  /**
-   * An array of prefix list IDs. A prefix list is a list of CIDR ranges of IP addresses. The IP
-   * addresses specified are allowed to access your workspace. If the list is not included in the
-   * configuration (passed an empty array) then no IP addresses are allowed to access the
-   * workspace.
-   *
-   * Maximum of 5 prefix lists allowed.
-   */
-  readonly prefixLists?: IPrefixList[];
-
-  /**
-   * An array of Amazon VPC endpoint IDs for the workspace. You can create VPC endpoints to your
-   * Amazon Managed Grafana workspace for access from within a VPC. If a NetworkAccessConfiguration
-   * is specified then only VPC endpoints specified here are allowed to access the workspace. If
-   * you pass in an empty array of strings, then no VPCs are allowed to access the workspace.
-   *
-   * Maximum of 5 VPC endpoints allowed.
-   */
-  readonly vpcEndpoints?: IVpcEndpoint[];
-}
-
-/**
- * The AWS notification channels that Amazon Managed Grafana can automatically create IAM roles and
- * permissions for, to allow Amazon Managed Grafana to use these channels.
- */
-export enum NotificationDestinations {
-  /**
-   * Amazon Simple Notification Service (SNS) as notification destination.
-   */
-  SNS = 'SNS',
-}
-
-/**
- * If this is SERVICE_MANAGED, and the workplace was created through the Amazon Managed Grafana
- * console, then Amazon Managed Grafana automatically creates the IAM roles and provisions the
- * permissions that the workspace needs to use AWS data sources and notification channels.
- *
- * If this is CUSTOMER_MANAGED, you must manage those roles and permissions yourself.
-
- * If you are working with a workspace in a member account of an organization and that account is
- * not a delegated administrator account, and you want the workspace to access data sources in
- * other AWS accounts in the organization, this parameter must be set to CUSTOMER_MANAGED.
- */
-export enum PermissionTypes {
-  /**
-   * Customer-managed permissions where you manage user access to Grafana.
-   */
-  CUSTOMER_MANAGED = 'CUSTOMER_MANAGED',
-
-  /**
-   * Service-managed permissions where AWS manages user access to Grafana.
-   */
-  SERVICE_MANAGED = 'SERVICE_MANAGED',
-}
-
-/**
- * A structure that defines which attributes in the IdP assertion are to be used to define
- * information about the users authenticated by the IdP to use the workspace.
- *
- * Each attribute must be a string with length between 1 and 256 characters.
- */
-export interface SamlAssertionAttributes {
-  /**
-   * The name of the attribute within the SAML assertion to use as the email names for SAML users.
-   *
-   * Must be between 1 and 256 characters long.
-   */
-  readonly email?: string;
-  /**
-   * The name of the attribute within the SAML assertion to use as the user full "friendly" names
-   * for user groups.
-   *
-   * Must be between 1 and 256 characters long.
-   */
-  readonly groups?: string;
-  /**
-   * The name of the attribute within the SAML assertion to use as the login names for SAML users.
-   *
-   * Must be between 1 and 256 characters long.
-   */
-  readonly login?: string;
-  /**
-   * The name of the attribute within the SAML assertion to use as the user full "friendly" names
-   * for SAML users.
-   *
-   * Must be between 1 and 256 characters long.
-   */
-  readonly name?: string;
-  /**
-   * The name of the attribute within the SAML assertion to use as the user full "friendly" names
-   * for the users' organizations.
-   *
-   * Must be between 1 and 256 characters long.
-   */
-  readonly org?: string;
-  /**
-   * The name of the attribute within the SAML assertion to use as the user roles.
-   *
-   * Must be between 1 and 256 characters long.
-   */
-  readonly role?: string;
-}
-
-/**
- * A structure containing the identity provider (IdP) metadata used to integrate the identity
- * provider with this workspace.
- */
-export interface SamlIdpMetadata {
-  /**
-   * The URL of the location containing the IdP metadata.
-   *
-   * Must be a string with length between 1 and 2048 characters.
-   */
-  readonly url?: string;
-
-  /**
-   * The full IdP metadata, in XML format.
-   */
-  readonly xml?: string;
-}
-
-/**
- * A structure containing arrays that map group names in the SAML assertion to the Grafana Admin
- * and Editor roles in the workspace.
- */
-export interface SamlRoleValues {
-  /**
-   * A list of groups from the SAML assertion attribute to grant the Grafana Admin role to.
-   *
-   * Maximum of 256 elements.
-   */
-  readonly admin?: string[];
-
-  /**
-   * A list of groups from the SAML assertion attribute to grant the Grafana Editor role to.
-   *
-   * Maximum of 256 elements.
-   */
-  readonly editor?: string[];
-}
-
-/**
- * If the workspace uses SAML, use this structure to map SAML assertion attributes to workspace
- * user information and define which groups in the assertion attribute are to have the Admin and
- * Editor roles in the workspace.
- */
-export interface SamlConfiguration {
-  /**
-   * Lists which organizations defined in the SAML assertion are allowed to use the Amazon Managed
-   * Grafana workspace. If this is empty, all organizations in the assertion attribute have access.
-   *
-   * Must have between 1 and 256 elements.
-   */
-  readonly allowedOrganizations?: string[];
-
-  /**
-   * A structure that defines which attributes in the SAML assertion are to be used to define
-   * information about the users authenticated by that IdP to use the workspace.
-   */
-  readonly assertionAtrributes?: SamlAssertionAttributes;
-
-  /**
-   * A structure containing the identity provider (IdP) metadata used to integrate the identity
-   * provider with this workspace.
-   *
-   * Required field for SAML configuration.
-   */
-  readonly idpMetadata: SamlIdpMetadata;
-
-  /**
-   * How long a sign-on session by a SAML user is valid, before the user has to sign on again.
-   *
-   * Must be a positive number.
-   */
-  readonly loginValidityDuration?: number;
-
-  /**
-   * A structure containing arrays that map group names in the SAML assertion to the Grafana Admin
-   * and Editor roles in the workspace.
-   */
-  readonly roleValues?: SamlRoleValues;
-}
-
-/**
- * The configuration settings for an Amazon VPC that contains data sources for your Grafana
- * workspace to connect to.
- */
-export interface VpcConfiguration {
-  /**
-   * The list of Amazon EC2 security groups attached to the Amazon VPC for your Grafana
-   * workspace to connect. Duplicates not allowed.
-   *
-   * Array Members: Minimum number of 1 items. Maximum number of 5 items.
-   *
-   * Required for VPC configuration.
-   */
-  readonly securityGroups: ISecurityGroup[];
-
-  /**
-   * The list of Amazon EC2 subnets created in the Amazon VPC for your Grafana workspace to
-   * connect. Duplicates not allowed.
-   *
-   * Array Members: Minimum number of 2 items. Maximum number of 6 items.
-   *
-   * Required for VPC configuration.
-   */
-  readonly subnets: ISubnet[];
-}
+import {
+  AccountAccessType,
+  AuthenticationProviders,
+  IWorkspace,
+  NetworkAccessControl,
+  NotificationDestinations,
+  PermissionTypes,
+  SamlConfiguration,
+  SamlConfigurationStatuses,
+  Status,
+  VpcConfiguration,
+  WorkspaceBase,
+} from './workspace-base';
 
 /**
  * Properties for creating an Amazon Managed Grafana workspace.
@@ -393,87 +151,212 @@ export interface WorkspaceProps {
   readonly vpcConfiguration?: VpcConfiguration;
 }
 
-/**
- * Status of SAML configuration for a Grafana workspace.
- */
-export enum SamlConfigurationStatuses {
+export interface WorkspaceAttributes {
   /**
-   * SAML is configured for the workspace.
+   * Specifies whether the workspace can access AWS resources in this AWS account only, or whether
+   * it can also access AWS resources in other accounts in the same organization. If this is
+   * ORGANIZATION, the OrganizationalUnits parameter specifies which organizational units the
+   * workspace can access.
+   *
+   * Required field.
    */
-  CONFIGURED = 'CONFIGURED',
+  readonly accountAccessType: AccountAccessType;
 
   /**
-   * SAML is not configured for the workspace.
+   * Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to
+   * authenticate users for using the Grafana console within a workspace.
+   *
+   * Required field.
    */
-  NOT_CONFIGURED = 'NOT_CONFIGURED',
-}
-
-/**
- * Status of a Grafana workspace.
- */
-export enum Status {
-  /**
-   * Workspace is active and ready to use.
-   */
-  ACTIVE = 'ACTIVE',
+  readonly authenticationProviders: AuthenticationProviders[];
 
   /**
-   * Workspace is being created.
+   * A unique, case-sensitive, user-provided identifier to ensure the idempotency of the request.
+   *
+   * Must be 1-64 characters long and contain only printable ASCII characters.
    */
-  CREATING = 'CREATING',
+  readonly clientToken?: string;
 
   /**
-   * Workspace is being deleted.
+   * Specifies the AWS data sources that have been configured to have IAM roles and permissions
+   * created to allow Amazon Managed Grafana to read data from these sources.
+   * This list is only used when the workspace was created through the AWS console, and the
+   * permissionType is SERVICE_MANAGED.
    */
-  DELETING = 'DELETING',
+  readonly dataSources?: string[];
 
   /**
-   * Workspace operation has failed.
+   * The user-defined description of the workspace.
+   *
+   * Maximum length of 2048 characters.
    */
-  FAILED = 'FAILED',
+  readonly description?: string;
 
   /**
-   * Workspace is being updated.
+   * The name of the workspace.
+   *
+   * Must be 1-255 characters long and contain only alphanumeric characters, hyphens, dots,
+   * underscores, and tildes.
    */
-  UPDATING = 'UPDATING',
+  readonly name?: string;
 
   /**
-   * Workspace is being upgraded.
+   * The configuration settings for network access to your workspace.
    */
-  UPGRADING = 'UPGRADING',
+  readonly networkAccessControl?: NetworkAccessControl;
 
   /**
-   * Workspace deletion has failed.
+   * The AWS notification channels that Amazon Managed Grafana can automatically create IAM roles
+   * and permissions for, to allow Amazon Managed Grafana to use these channels.
    */
-  DELETION_FAILED = 'DELETION_FAILED',
+  readonly notificationDestinations?: NotificationDestinations[];
 
   /**
-   * Workspace creation has failed.
+   * Specifies the organizational units that this workspace is allowed to use data sources from, if
+   * this workspace is in an account that is part of an organization.
    */
-  CREATION_FAILED = 'CREATION_FAILED',
+  readonly organizationalUnits?: string[];
 
   /**
-   * Workspace update has failed.
+   * Name of the IAM role to use for the organization.
+   * Maximum length of 2048 characters.
    */
-  UPDATE_FAILED = 'UPDATE_FAILED',
+  readonly organizationRoleName?: string;
 
   /**
-   * Workspace upgrade has failed.
+   * If this is SERVICE_MANAGED, and the workplace was created through the Amazon Managed Grafana
+   * console, then Amazon Managed Grafana automatically creates the IAM roles and provisions the
+   * permissions that the workspace needs to use AWS data sources and notification channels.
+   *
+   * If this is CUSTOMER_MANAGED, you must manage those roles and permissions yourself.
+   *
+   * If you are working with a workspace in a member account of an organization and that account is
+   * not a delegated administrator account, and you want the workspace to access data sources in
+   * other AWS accounts in the organization, this parameter must be set to CUSTOMER_MANAGED.
+   *
+   * Required field.
    */
-  UPGRADE_FAILED = 'UPGRADE_FAILED',
+  readonly permissionType: PermissionTypes;
 
   /**
-   * License removal has failed.
+   * Whether plugin administration is enabled in the workspace. Setting to true allows workspace
+   * admins to install, uninstall, and update plugins from within the Grafana workspace.
+   *
+   * This option is only valid for workspaces that support Grafana version 9 or newer.
+   *
+   * Default: false
    */
-  LICENSE_REMOVAL_FAILED = 'LICENSE_REMOVAL_FAILED',
-}
+  readonly pluginAdminEnabled?: boolean;
+
+  /**
+   * The IAM role that grants permissions to the AWS resources that the workspace will view data
+   * from.
+   */
+  readonly role?: IRole;
+
+  /**
+   * If the workspace uses SAML, use this structure to map SAML assertion attributes to workspace
+   * user information and define which groups in the assertion attribute are to have the Admin and
+   * Editor roles in the workspace.
+   */
+  readonly samlConfiguration?: SamlConfiguration;
+
+  /**
+   * The name of the AWS CloudFormation stack set that is used to generate IAM roles to be used for
+   * this workspace.
+   */
+  readonly stackSetName?: string;
+
+  /**
+   * The configuration settings for an Amazon VPC that contains data sources for your Grafana
+   * workspace to connect to.
+   */
+  readonly vpcConfiguration?: VpcConfiguration;
+
+  /**
+   * The arn of this workspace.
+   *
+   * Either this or the workspaceId must be provided.
+   */
+  readonly workspaceArn?: string;
+
+  /**
+   * The unique ID of this workspace.
+   *
+   * Either this or the workspaceArn must be provided.
+   */
+  readonly workspaceId?: string;
+};
 
 /**
  * Specifies a workspace. In a workspace, you can create Grafana dashboards and visualizations to
  * analyze your metrics, logs, and traces. You don't have to build, package, or deploy any hardware
  * to run the Grafana server.
  */
-export class Workspace extends Construct {
+export class Workspace extends WorkspaceBase {
+
+  public static fromWorkspaceAttributes(scope: Construct, id: string, attrs: WorkspaceAttributes): IWorkspace {
+    class Import extends WorkspaceBase {
+      public readonly accountAccessType: AccountAccessType;
+      public readonly authenticationProviders: AuthenticationProviders[];
+      public readonly clientToken?: string;
+      public readonly dataSources?: string[];
+      public readonly description?: string;
+      public readonly name?: string;
+      public readonly networkAccessControl?: NetworkAccessControl;
+      public readonly notificationDestinations?: NotificationDestinations[];
+      public readonly organizationalUnits?: string[];
+      public readonly organizationRoleName?: string;
+      public readonly permissionType: PermissionTypes;
+      public readonly pluginAdminEnabled?: boolean;
+      public readonly role?: IRole;
+      public readonly samlConfiguration?: SamlConfiguration;
+      public readonly stackSetName?: string;
+      public readonly vpcConfiguration?: VpcConfiguration;
+      public readonly workspaceArn: string;
+      public readonly workspaceId: string;
+
+      public constructor(attributes: WorkspaceAttributes) {
+        super(scope, id);
+
+        this.accountAccessType = attributes.accountAccessType;
+        this.authenticationProviders = attributes.authenticationProviders;
+        this.clientToken = attributes.clientToken;
+        this.dataSources = attributes.dataSources;
+        this.description = attributes.description;
+        this.name = attributes.name;
+        this.networkAccessControl = attributes.networkAccessControl;
+        this.notificationDestinations = attributes.notificationDestinations;
+        this.organizationalUnits = attributes.organizationalUnits;
+        this.organizationRoleName = attributes.organizationRoleName;
+        this.permissionType = attributes.permissionType;
+        this.pluginAdminEnabled = attributes.pluginAdminEnabled;
+        this.role = attributes.role;
+        this.samlConfiguration = attributes.samlConfiguration;
+        this.stackSetName = attributes.stackSetName;
+        this.vpcConfiguration = attributes.vpcConfiguration;
+
+        if (attributes.workspaceArn && attributes.workspaceId) {
+          if (this.getWorkspaceId(attributes.workspaceArn) !== attributes.workspaceId) {
+            throw new Error(`workspaceId (${attributes.workspaceId}) does not match workspaceArn (${attributes.workspaceArn})`);
+          }
+          this.workspaceArn = attributes.workspaceArn;
+          this.workspaceId = attributes.workspaceId;
+        } else if (attributes.workspaceArn) {
+          this.workspaceArn = attributes.workspaceArn;
+          this.workspaceId = this.getWorkspaceId(attributes.workspaceArn);
+        } else if (attributes.workspaceId) {
+          this.workspaceId = attributes.workspaceId;
+          this.workspaceArn = this.getWorkspaceArn(attributes.workspaceId);
+        } else {
+          throw new Error('workspaceArn or workspaceId must be provided');
+        }
+      }
+    }
+
+    return new Import(attrs);
+  }
+
   /**
    * Validates the clientToken property.
    *
@@ -1160,7 +1043,7 @@ export class Workspace extends Construct {
   /**
    * The unique ID of this workspace.
    */
-  public readonly id: string;
+  public readonly workspaceId: string;
 
   /**
    * The most recent date that the workspace was modified.
@@ -1182,6 +1065,11 @@ export class Workspace extends Construct {
    * The current status of the workspace.
    */
   public readonly status: Status;
+
+  /**
+   * The arn of this workspace.
+   */
+  public readonly workspaceArn: string;
 
   constructor(scope: Construct, id: string, props: WorkspaceProps) {
     super(scope, id);
@@ -1247,14 +1135,17 @@ export class Workspace extends Construct {
     };
 
     this.workspace = new CfnWorkspace(this, 'Resource', cfnWorkspaceProps);
+    this.node.defaultChild = this.workspace;
+
     this.creationTimestamp = this.workspace.attrCreationTimestamp;
     this.endpoint = this.workspace.attrEndpoint;
     this.grafanaVersion = this.workspace.attrGrafanaVersion;
-    this.id = this.workspace.attrId;
+    this.workspaceId = this.workspace.attrId;
     this.modificationTimestamp = this.workspace.attrModificationTimestamp;
     this.samlConfigurationStatus = this.workspace
       .attrSamlConfigurationStatus as SamlConfigurationStatuses;
     this.ssoClientId = this.workspace.attrSsoClientId;
     this.status = this.workspace.attrStatus as Status;
+    this.workspaceArn = this.getWorkspaceArn(this.workspaceId);
   }
 }

@@ -14,14 +14,15 @@ import {
   VpcConfiguration,
   Workspace,
   WorkspaceProps,
-} from '../src/workspace';
+} from '../src';
 
 let stack: Stack;
 let role: Role;
 let vpc: Vpc;
 
+
 beforeEach(() => {
-  stack = new Stack();
+  stack = new Stack(undefined, undefined, { env: { account: '123456789012', region: 'us-east-1' } });
   role = new Role(stack, 'GrafanaWorkspaceRole', {
     assumedBy: new ServicePrincipal('grafana.amazonaws.com'),
     description: 'Role for Amazon Managed Grafana Workspace',
@@ -1046,6 +1047,72 @@ describe('Workspace', () => {
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
         expect(e.message).toContain('vpcConfiguration: subnets cannot have more than 6 items');
+      }
+    });
+
+    test('should import from workspaceId', () => {
+      const workspaceId = 'workspace-id';
+      const workspace = Workspace.fromWorkspaceAttributes(stack, 'Workspace', {
+        accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
+        authenticationProviders: [AuthenticationProviders.AWS_SSO],
+        permissionType: PermissionTypes.CUSTOMER_MANAGED,
+        workspaceId,
+      });
+      expect(workspace.workspaceId).toEqual(workspaceId);
+      expect(workspace.workspaceArn).toEqual(`arn:${stack.partition}:grafana:${stack.region}:${stack.account}:/workspaces/${workspaceId}`);
+    });
+
+    test('should import from workspaceArn', () => {
+      const workspaceArn = `arn:${stack.partition}:grafana:${stack.region}:${stack.account}:/workspaces/workspace-id`;
+      const workspace = Workspace.fromWorkspaceAttributes(stack, 'Workspace', {
+        accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
+        authenticationProviders: [AuthenticationProviders.AWS_SSO],
+        permissionType: PermissionTypes.CUSTOMER_MANAGED,
+        workspaceArn,
+      });
+      expect(workspace.workspaceId).toEqual('workspace-id');
+      expect(workspace.workspaceArn).toEqual(workspaceArn);
+    });
+
+    test('should import from workspaceId and workspaceArn', () => {
+      const workspaceId = 'workspace-id';
+      const workspaceArn = `arn:${stack.partition}:grafana:${stack.region}:${stack.account}:/workspaces/${workspaceId}`;
+      const workspace = Workspace.fromWorkspaceAttributes(stack, 'Workspace', {
+        accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
+        authenticationProviders: [AuthenticationProviders.AWS_SSO],
+        permissionType: PermissionTypes.CUSTOMER_MANAGED,
+        workspaceId,
+        workspaceArn,
+      });
+      expect(workspace.workspaceId).toEqual(workspaceId);
+      expect(workspace.workspaceArn).toEqual(workspaceArn);
+    });
+
+    test('should fail if neither workspaceId or workspaceArn is provided', () => {
+      try {
+        Workspace.fromWorkspaceAttributes(stack, 'Workspace', {
+          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
+          authenticationProviders: [AuthenticationProviders.AWS_SSO],
+          permissionType: PermissionTypes.CUSTOMER_MANAGED,
+        });
+        throw new Error('Expected error was not thrown');
+      } catch (e: any) {
+        expect(e.message).toContain('workspaceArn or workspaceId must be provided');
+      }
+    });
+
+    test('should fail if workspace-id and arn do not match', () => {
+      try {
+        Workspace.fromWorkspaceAttributes(stack, 'Workspace', {
+          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
+          authenticationProviders: [AuthenticationProviders.AWS_SSO],
+          permissionType: PermissionTypes.CUSTOMER_MANAGED,
+          workspaceId: 'workspace-id',
+          workspaceArn: 'arn:aws:grafana:us-east-1:123456789012:/workspaces/other-workspace-id',
+        });
+        throw new Error('Expected error was not thrown');
+      } catch (e: any) {
+        expect(e.message).toContain('workspaceId (workspace-id) does not match workspaceArn (arn:aws:grafana:us-east-1:123456789012:/workspaces/other-workspace-id)');
       }
     });
 

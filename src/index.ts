@@ -1,16 +1,2 @@
-export {
-  AccountAccessType,
-  AuthenticationProviders,
-  NetworkAccessControl,
-  NotificationDestinations,
-  PermissionTypes,
-  SamlAssertionAttributes,
-  SamlConfiguration,
-  SamlConfigurationStatuses,
-  SamlIdpMetadata,
-  SamlRoleValues,
-  Status,
-  VpcConfiguration,
-  Workspace,
-  WorkspaceProps,
-} from './workspace';
+export * from './workspace';
+export * from './workspace-base';
