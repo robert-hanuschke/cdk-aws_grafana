@@ -1,4 +1,4 @@
-import { awscdk } from 'projen';
+import { awscdk, javascript } from 'projen';
 const project = new awscdk.AwsCdkConstructLibrary({
   author: 'Robert Hanuschke',
   authorAddress: 'robhan-cdk-lib@hanuschke.eu',
@@ -20,6 +20,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   license: 'MIT',
   name: 'aws_grafana',
   packageName: '@robhan-cdk-lib/aws_grafana',
+  packageManager: javascript.NodePackageManager.YARN_CLASSIC,
   projenrcTs: true,
   publishToPypi: {
     distName: 'robhan_cdk_lib.aws_grafana',
