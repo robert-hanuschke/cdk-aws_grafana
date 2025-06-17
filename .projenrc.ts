@@ -21,6 +21,10 @@ const project = new awscdk.AwsCdkConstructLibrary({
   name: 'aws_grafana',
   packageName: '@robhan-cdk-lib/aws_grafana',
   projenrcTs: true,
+  publishToPypi: {
+    distName: 'robhan_cdk_lib.aws_grafana',
+    module: 'robhan_cdk_lib.aws_grafana',
+  },
   repositoryUrl: 'https://github.com/robert-hanuschke/cdk-aws_grafana',
 });
 
