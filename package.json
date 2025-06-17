@@ -37,7 +37,7 @@
   "devDependencies": {
     "@stylistic/eslint-plugin": "^2",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.15.31",
+    "@types/node": "^22.15.32",
     "@typescript-eslint/eslint-plugin": "^8",
     "@typescript-eslint/parser": "^8",
     "aws-cdk-lib": "2.198.0",
@@ -53,7 +53,7 @@
     "jsii-docgen": "^10.5.0",
     "jsii-pacmak": "^1.112.0",
     "jsii-rosetta": "~5.8.0",
-    "projen": "^0.92.10",
+    "projen": "^0.92.11",
     "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
