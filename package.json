@@ -32,7 +32,7 @@
   },
   "author": {
     "name": "Robert Hanuschke",
-    "email": "robhan@amazon.de",
+    "email": "robhan-cdk-lib@hanuschke.eu",
     "organization": false
   },
   "devDependencies": {

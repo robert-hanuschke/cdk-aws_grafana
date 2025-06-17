@@ -1,7 +1,7 @@
 import { awscdk } from 'projen';
 const project = new awscdk.AwsCdkConstructLibrary({
   author: 'Robert Hanuschke',
-  authorAddress: 'robhan@amazon.de',
+  authorAddress: 'robhan-cdk-lib@hanuschke.eu',
   autoApproveOptions: {
     allowedUsernames: ['robert-hanuschke'],
     secret: 'GITHUB_TOKEN',
