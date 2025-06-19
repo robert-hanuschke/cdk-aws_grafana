@@ -17,6 +17,7 @@
     "eslint": "npx projen eslint",
     "package": "npx projen package",
     "package-all": "npx projen package-all",
+    "package:dotnet": "npx projen package:dotnet",
     "package:js": "npx projen package:js",
     "package:python": "npx projen package:python",
     "post-compile": "npx projen post-compile",
@@ -123,6 +124,10 @@
       "python": {
         "distName": "robhan_cdk_lib.aws_grafana",
         "module": "robhan_cdk_lib.aws_grafana"
+      },
+      "dotnet": {
+        "namespace": "Robhan.CdkLib",
+        "packageId": "Robhan.CdkLib.AwsGrafana"
       }
     },
     "tsc": {

@@ -22,6 +22,10 @@ const project = new awscdk.AwsCdkConstructLibrary({
   packageName: '@robhan-cdk-lib/aws_grafana',
   packageManager: javascript.NodePackageManager.YARN_CLASSIC,
   projenrcTs: true,
+  publishToNuget: {
+    dotNetNamespace: 'Robhan.CdkLib',
+    packageId: 'Robhan.CdkLib.AwsGrafana',
+  },
   publishToPypi: {
     distName: 'robhan_cdk_lib.aws_grafana',
     module: 'robhan_cdk_lib.aws_grafana',
