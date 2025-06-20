@@ -275,17 +275,8 @@ export interface WorkspaceAttributes {
 
   /**
    * The arn of this workspace.
-   *
-   * Either this or the workspaceId must be provided.
    */
-  readonly workspaceArn?: string;
-
-  /**
-   * The unique ID of this workspace.
-   *
-   * Either this or the workspaceArn must be provided.
-   */
-  readonly workspaceId?: string;
+  readonly workspaceArn: string;
 };
 
 /**
@@ -335,22 +326,8 @@ export class Workspace extends WorkspaceBase {
         this.samlConfiguration = attributes.samlConfiguration;
         this.stackSetName = attributes.stackSetName;
         this.vpcConfiguration = attributes.vpcConfiguration;
-
-        if (attributes.workspaceArn && attributes.workspaceId) {
-          if (this.getWorkspaceId(attributes.workspaceArn) !== attributes.workspaceId) {
-            throw new Error(`workspaceId (${attributes.workspaceId}) does not match workspaceArn (${attributes.workspaceArn})`);
-          }
-          this.workspaceArn = attributes.workspaceArn;
-          this.workspaceId = attributes.workspaceId;
-        } else if (attributes.workspaceArn) {
-          this.workspaceArn = attributes.workspaceArn;
-          this.workspaceId = this.getWorkspaceId(attributes.workspaceArn);
-        } else if (attributes.workspaceId) {
-          this.workspaceId = attributes.workspaceId;
-          this.workspaceArn = this.getWorkspaceArn(attributes.workspaceId);
-        } else {
-          throw new Error('workspaceArn or workspaceId must be provided');
-        }
+        this.workspaceArn = attributes.workspaceArn;
+        this.workspaceId = this.getWorkspaceId(attributes.workspaceArn);
       }
     }
 
