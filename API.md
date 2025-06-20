@@ -1429,6 +1429,7 @@ const workspaceAttributes: WorkspaceAttributes = { ... }
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.accountAccessType">accountAccessType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a></code> | Specifies whether the workspace can access AWS resources in this AWS account only, or whether it can also access AWS resources in other accounts in the same organization. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.authenticationProviders">authenticationProviders</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]</code> | Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to authenticate users for using the Grafana console within a workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.permissionType">permissionType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes">PermissionTypes</a></code> | If this is SERVICE_MANAGED, and the workplace was created through the Amazon Managed Grafana console, then Amazon Managed Grafana automatically creates the IAM roles and provisions the permissions that the workspace needs to use AWS data sources and notification channels. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.workspaceArn">workspaceArn</a></code> | <code>string</code> | The arn of this workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.clientToken">clientToken</a></code> | <code>string</code> | A unique, case-sensitive, user-provided identifier to ensure the idempotency of the request. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.dataSources">dataSources</a></code> | <code>string[]</code> | Specifies the AWS data sources that have been configured to have IAM roles and permissions created to allow Amazon Managed Grafana to read data from these sources. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.description">description</a></code> | <code>string</code> | The user-defined description of the workspace. |
@@ -1442,8 +1443,6 @@ const workspaceAttributes: WorkspaceAttributes = { ... }
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.samlConfiguration">samlConfiguration</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration">SamlConfiguration</a></code> | If the workspace uses SAML, use this structure to map SAML assertion attributes to workspace user information and define which groups in the assertion attribute are to have the Admin and Editor roles in the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.stackSetName">stackSetName</a></code> | <code>string</code> | The name of the AWS CloudFormation stack set that is used to generate IAM roles to be used for this workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.vpcConfiguration">vpcConfiguration</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.VpcConfiguration">VpcConfiguration</a></code> | The configuration settings for an Amazon VPC that contains data sources for your Grafana workspace to connect to. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.workspaceArn">workspaceArn</a></code> | <code>string</code> | The arn of this workspace. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.workspaceId">workspaceId</a></code> | <code>string</code> | The unique ID of this workspace. |
 
 ---
 
@@ -1496,6 +1495,18 @@ not a delegated administrator account, and you want the workspace to access data
 other AWS accounts in the organization, this parameter must be set to CUSTOMER_MANAGED.
 
 Required field.
+
+---
+
+##### `workspaceArn`<sup>Required</sup> <a name="workspaceArn" id="@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.workspaceArn"></a>
+
+```typescript
+public readonly workspaceArn: string;
+```
+
+- *Type:* string
+
+The arn of this workspace.
 
 ---
 
@@ -1671,34 +1682,6 @@ public readonly vpcConfiguration: VpcConfiguration;
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.VpcConfiguration">VpcConfiguration</a>
 
 The configuration settings for an Amazon VPC that contains data sources for your Grafana workspace to connect to.
-
----
-
-##### `workspaceArn`<sup>Optional</sup> <a name="workspaceArn" id="@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.workspaceArn"></a>
-
-```typescript
-public readonly workspaceArn: string;
-```
-
-- *Type:* string
-
-The arn of this workspace.
-
-Either this or the workspaceId must be provided.
-
----
-
-##### `workspaceId`<sup>Optional</sup> <a name="workspaceId" id="@robhan-cdk-lib/aws_grafana.WorkspaceAttributes.property.workspaceId"></a>
-
-```typescript
-public readonly workspaceId: string;
-```
-
-- *Type:* string
-
-The unique ID of this workspace.
-
-Either this or the workspaceArn must be provided.
 
 ---
 
