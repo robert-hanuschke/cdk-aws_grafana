@@ -1059,11 +1059,11 @@ describe('Workspace', () => {
         workspaceId,
       });
       expect(workspace.workspaceId).toEqual(workspaceId);
-      expect(workspace.workspaceArn).toEqual(`arn:${stack.partition}:grafana:${stack.region}:${stack.account}:/workspaces/${workspaceId}`);
+      expect(workspace.workspaceArn).toEqual(`arn:${stack.partition}:grafana:${stack.region}:${stack.account}:workspaces/${workspaceId}`);
     });
 
     test('should import from workspaceArn', () => {
-      const workspaceArn = `arn:${stack.partition}:grafana:${stack.region}:${stack.account}:/workspaces/workspace-id`;
+      const workspaceArn = `arn:${stack.partition}:grafana:${stack.region}:${stack.account}:workspaces/workspace-id`;
       const workspace = Workspace.fromWorkspaceAttributes(stack, 'Workspace', {
         accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
         authenticationProviders: [AuthenticationProviders.AWS_SSO],
@@ -1076,7 +1076,7 @@ describe('Workspace', () => {
 
     test('should import from workspaceId and workspaceArn', () => {
       const workspaceId = 'workspace-id';
-      const workspaceArn = `arn:${stack.partition}:grafana:${stack.region}:${stack.account}:/workspaces/${workspaceId}`;
+      const workspaceArn = `arn:${stack.partition}:grafana:${stack.region}:${stack.account}:workspaces/${workspaceId}`;
       const workspace = Workspace.fromWorkspaceAttributes(stack, 'Workspace', {
         accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
         authenticationProviders: [AuthenticationProviders.AWS_SSO],
@@ -1108,11 +1108,11 @@ describe('Workspace', () => {
           authenticationProviders: [AuthenticationProviders.AWS_SSO],
           permissionType: PermissionTypes.CUSTOMER_MANAGED,
           workspaceId: 'workspace-id',
-          workspaceArn: 'arn:aws:grafana:us-east-1:123456789012:/workspaces/other-workspace-id',
+          workspaceArn: 'arn:aws:grafana:us-east-1:123456789012:workspaces/other-workspace-id',
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('workspaceId (workspace-id) does not match workspaceArn (arn:aws:grafana:us-east-1:123456789012:/workspaces/other-workspace-id)');
+        expect(e.message).toContain('workspaceId (workspace-id) does not match workspaceArn (arn:aws:grafana:us-east-1:123456789012:workspaces/other-workspace-id)');
       }
     });
 

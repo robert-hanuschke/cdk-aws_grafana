@@ -569,7 +569,7 @@ export abstract class WorkspaceBase extends Resource implements IWorkspace {
 
   protected getWorkspaceArn(workspaceId: string) {
     const stack = this.stack;
-    return `arn:${stack.partition}:grafana:${stack.region}:${stack.account}:/workspaces/${workspaceId}`;
+    return `arn:${stack.partition}:grafana:${stack.region}:${stack.account}:workspaces/${workspaceId}`;
   }
 
   protected getWorkspaceId(workspaceArn: string) {
