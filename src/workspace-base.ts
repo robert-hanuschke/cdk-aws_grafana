@@ -336,20 +336,17 @@ export interface IWorkspace extends IResource {
    * it can also access AWS resources in other accounts in the same organization. If this is
    * ORGANIZATION, the OrganizationalUnits parameter specifies which organizational units the
    * workspace can access.
-   * @attribute
    */
   readonly accountAccessType: AccountAccessType;
 
   /**
    * Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to
    * authenticate users for using the Grafana console within a workspace.
-   * @attribute
    */
   readonly authenticationProviders: AuthenticationProviders[];
 
   /**
    * A unique, case-sensitive, user-provided identifier to ensure the idempotency of the request.
-   * @attribute
    */
   readonly clientToken?: string;
 
@@ -359,45 +356,38 @@ export interface IWorkspace extends IResource {
    *
    * This list is only used when the workspace was created through the AWS console, and the
    * permissionType is SERVICE_MANAGED.
-   * @attribute
    */
   readonly dataSources?: string[];
 
   /**
    * The user-defined description of the workspace.
-   * @attribute
    */
   readonly description?: string;
 
   /**
    * The name of the workspace.
-   * @attribute
    */
   readonly name?: string;
 
   /**
    * The configuration settings for network access to your workspace.
-   * @attribute
    */
   readonly networkAccessControl?: NetworkAccessControl;
 
   /**
    * The AWS notification channels that Amazon Managed Grafana can automatically create IAM roles
    * and permissions for, to allow Amazon Managed Grafana to use these channels.
-   * @attribute
    */
   readonly notificationDestinations?: NotificationDestinations[];
 
   /**
    * Specifies the organizational units that this workspace is allowed to use data sources from, if
    * this workspace is in an account that is part of an organization.
-   * @attribute
    */
   readonly organizationalUnits?: string[];
 
   /**
    * The name of the IAM role that is used to access resources through Organizations.
-   * @attribute
    */
   readonly organizationRoleName?: string;
 
@@ -411,7 +401,6 @@ export interface IWorkspace extends IResource {
    * If you are working with a workspace in a member account of an organization and that account is
    * not a delegated administrator account, and you want the workspace to access data sources in
    * other AWS accounts in the organization, this parameter must be set to CUSTOMER_MANAGED.
-   * @attribute
    */
   readonly permissionType: PermissionTypes;
 
@@ -420,14 +409,12 @@ export interface IWorkspace extends IResource {
    * admins to install, uninstall, and update plugins from within the Grafana workspace.
    *
    * This option is only valid for workspaces that support Grafana version 9 or newer.
-   * @attribute
    */
   readonly pluginAdminEnabled?: boolean;
 
   /**
    * The IAM role that grants permissions to the AWS resources that the workspace will view data
    * from.
-   * @attribute
    */
   readonly role?: IRole;
 
@@ -435,21 +422,18 @@ export interface IWorkspace extends IResource {
    * If the workspace uses SAML, use this structure to map SAML assertion attributes to workspace
    * user information and define which groups in the assertion attribute are to have the Admin and
    * Editor roles in the workspace.
-   * @attribute
    */
   readonly samlConfiguration?: SamlConfiguration;
 
   /**
    * The name of the AWS CloudFormation stack set that is used to generate IAM roles to be used for
    * this workspace.
-   * @attribute
    */
   readonly stackSetName?: string;
 
   /**
    * The configuration settings for an Amazon VPC that contains data sources for your Grafana
    * workspace to connect to.
-   * @attribute
    */
   readonly vpcConfiguration?: VpcConfiguration;
 
