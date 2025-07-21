@@ -75,6 +75,17 @@ describe('Workspace', () => {
       expect(workspace).toBeDefined();
     });
 
+    test('should create a new workspace with minimal parameters', () => {
+      const workspace = new Workspace(stack, 'Workspace', {
+        accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
+        authenticationProviders: [AuthenticationProviders.AWS_SSO],
+        permissionType: PermissionTypes.CUSTOMER_MANAGED,
+        role,
+      });
+
+      expect(workspace).toBeDefined();
+    });
+
     test('should fail if props is not an object', () => {
       try {
         new Workspace(stack, 'Workspace', 1 as unknown as WorkspaceProps);
