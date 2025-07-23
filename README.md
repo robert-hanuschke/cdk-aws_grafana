@@ -16,7 +16,7 @@ The CDK maintainers explain that [publishing your own package](https://github.co
 
 This project aims to develop aws_grafana constructs to a maturity that can potentially be accepted to the CDK core.
 
-It is not supported by AWS and is not endorsed by them. Please file issues in the [GitHub repository](https://github.com/robert-hanuschke/robhan-cdk-lib-aws-grafana/issues) if you find any.
+It is not supported by AWS and is not endorsed by them. Please file issues in the [GitHub repository](https://github.com/robert-hanuschke/cdk-aws_grafana/issues) if you find any.
 
 ## Example use
 
