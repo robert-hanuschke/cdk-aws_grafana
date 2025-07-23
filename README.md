@@ -1,14 +1,22 @@
 # @robhan-cdk-lib/aws_grafana
 
-AWS Cloud Development Kit (CDK) L2 constructs for Amazon Managed Grafana.
+AWS Cloud Development Kit (CDK) constructs for Amazon Managed Grafana.
 
-In [aws-cdk-lib.aws_grafana](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_grafana-readme.html), there currently only exist L1 constructs for Amazon Managed Grafana.
+In [aws-cdk-lib.aws_grafana](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_grafana-readme.html), there currently only exist L1 constructs for Amazon Managed Grafana. 
+
+While helpful, they miss convenience like:
+
+- advanced parameter checking (min/max number values, string lengths, array lengths...) before CloudFormation deployment
+- proper parameter typing, e.g. enum values instead of strings
+- simply referencing other constructs instead of e.g. ARN strings
+
+Those features are implemented here.
 
 The CDK maintainers explain that [publishing your own package](https://github.com/aws/aws-cdk/blob/main/CONTRIBUTING.md#publishing-your-own-package) is "by far the strongest signal you can give to the CDK team that a feature should be included within the core aws-cdk packages".
 
-This project aims to develop aws_grafana L2 constructs to a maturity that is accepted to the CDK core.
+This project aims to develop aws_grafana constructs to a maturity that can potentially be accepted to the CDK core.
 
-Currently, development is focusing on the npm package. But PyPI, Maven Central, NuGet, and GitHub (for Go) will be added once a more stable state is reached.
+It is not supported by AWS and is not endorsed by them. Please file issues in the [GitHub repository](https://github.com/robert-hanuschke/robhan-cdk-lib-aws-grafana/issues) if you find any.
 
 ## Example use
 
