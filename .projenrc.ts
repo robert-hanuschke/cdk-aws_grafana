@@ -9,6 +9,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   autoApproveUpgrades: true,
   cdkVersion: '2.198.0',
   defaultReleaseBranch: 'main',
+  deps: ['@robhan-cdk-lib/utils'],
   depsUpgradeOptions: {
     workflowOptions: {
       labels: ['auto-approve', 'auto-merge'],

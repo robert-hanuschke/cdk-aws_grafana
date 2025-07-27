@@ -66,6 +66,9 @@
     "aws-cdk-lib": "^2.198.0",
     "constructs": "^10.0.5"
   },
+  "dependencies": {
+    "@robhan-cdk-lib/utils": "^0.0.5"
+  },
   "keywords": [
     "cdk",
     "grafana"

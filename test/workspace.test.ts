@@ -119,7 +119,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('clientToken: clientToken must be a string');
+        expect(e.message).toContain('clientToken: must be a string');
       }
     });
 
@@ -134,7 +134,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('clientToken: clientToken must be between 1 and 64 characters long');
+        expect(e.message).toContain('clientToken: must be at most 64 characters long');
       }
     });
 
@@ -149,7 +149,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('clientToken: clientToken must contain only printable ASCII characters');
+        expect(e.message).toContain('clientToken: must contain only printable ASCII characters');
       }
     });
 
@@ -164,7 +164,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('description: description must be a string');
+        expect(e.message).toContain('description: must be a string');
       }
     });
 
@@ -179,7 +179,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('description: description cannot exceed 2048 characters');
+        expect(e.message).toContain('description: must be at most 2048 characters long');
       }
     });
 
@@ -194,7 +194,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('grafanaVersion: grafanaVersion must be a string');
+        expect(e.message).toContain('grafanaVersion: must be a string');
       }
     });
 
@@ -209,7 +209,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('grafanaVersion: grafanaVersion cannot be empty');
+        expect(e.message).toContain('grafanaVersion: must be at least 1 character long');
       }
     });
 
@@ -224,7 +224,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('grafanaVersion: grafanaVersion cannot exceed 255 characters');
+        expect(e.message).toContain('grafanaVersion: must be at most 255 characters long');
       }
     });
 
@@ -239,7 +239,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('name: name must be a string');
+        expect(e.message).toContain('name: must be a string');
       }
     });
 
@@ -254,7 +254,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('name: name must be between 1 and 255 characters long');
+        expect(e.message).toContain('name: must be at most 255 characters long');
       }
     });
 
@@ -269,7 +269,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('name: name can only contain alphanumeric characters, hyphens, dots, underscores, and tildes');
+        expect(e.message).toContain('name: can only contain alphanumeric characters, hyphens, dots, underscores, and tildes');
       }
     });
 
@@ -284,7 +284,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('networkAccessControl: networkAccessControl must be an object');
+        expect(e.message).toContain('networkAccessControl: must be an object');
       }
     });
 
@@ -320,7 +320,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('networkAccessControl: prefixLists can have at most 5 items');
+        expect(e.message).toContain('networkAccessControl: prefixLists must have at most 5 elements');
       }
     });
 
@@ -359,7 +359,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('networkAccessControl: vpcEndpoints can have at most 5 items');
+        expect(e.message).toContain('networkAccessControl: vpcEndpoints must have at most 5 elements');
       }
     });
 
@@ -374,7 +374,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('organizationRoleName: organizationRoleName must be a string');
+        expect(e.message).toContain('organizationRoleName: must be a string');
       }
     });
 
@@ -389,7 +389,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('organizationRoleName: organizationRoleName cannot be empty');
+        expect(e.message).toContain('organizationRoleName: must be at least 1 character long');
       }
     });
 
@@ -404,7 +404,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('organizationRoleName: organizationRoleName cannot exceed 2048 characters');
+        expect(e.message).toContain('organizationRoleName: must be at most 2048 characters long');
       }
     });
 
@@ -419,7 +419,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: samlConfiguration must be an object');
+        expect(e.message).toContain('samlConfiguration: must be an object');
       }
     });
 
@@ -437,7 +437,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: assertionAtrributes: Input is not an object');
+        expect(e.message).toContain('samlConfiguration: assertionAtrributes: must be an object');
       }
     });
 
@@ -478,7 +478,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain("samlConfiguration: assertionAtrributes: Property 'email' cannot be empty");
+        expect(e.message).toContain("samlConfiguration: assertionAtrributes: Property 'email' must be at least 1 character long");
       }
     });
 
@@ -498,7 +498,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain("samlConfiguration: assertionAtrributes: Property 'email' exceeds maximum length of 256 characters");
+        expect(e.message).toContain("samlConfiguration: assertionAtrributes: Property 'email' must be at most 256 characters long");
       }
     });
 
@@ -515,7 +515,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: idpMetadata: Input is not an object');
+        expect(e.message).toContain('samlConfiguration: idpMetadata: must be an object');
       }
     });
 
@@ -553,7 +553,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain("Property 'url' cannot be empty");
+        expect(e.message).toContain("samlConfiguration: idpMetadata: Property 'url' must be at least 1 character long");
       }
     });
 
@@ -572,7 +572,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain("Property 'url' exceeds maximum length of 2048 characters");
+        expect(e.message).toContain("samlConfiguration: idpMetadata: Property 'url' must be at most 2048 characters long");
       }
     });
 
@@ -662,7 +662,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: allowedOrganizations cannot have more than 256 elements');
+        expect(e.message).toContain('samlConfiguration: allowedOrganizations must have at most 256 elements');
       }
     });
 
@@ -716,7 +716,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: loginValidityDuration must be positive');
+        expect(e.message).toContain('samlConfiguration: loginValidityDuration must be at least 1');
       }
     });
 
@@ -794,7 +794,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: roleValues.admin cannot have more than 256 elements');
+        expect(e.message).toContain('samlConfiguration: roleValues.admin must have at most 256 elements');
       }
     });
 
@@ -854,7 +854,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: roleValues.editor cannot have more than 256 elements');
+        expect(e.message).toContain('samlConfiguration: roleValues.editor must have at most 256 elements');
       }
     });
 
@@ -940,7 +940,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('vpcConfiguration: securityGroups must have at least 1 item');
+        expect(e.message).toContain('vpcConfiguration: securityGroups must have at least 1 element');
       }
     });
 
@@ -968,7 +968,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('vpcConfiguration: securityGroups cannot have more than 5 items');
+        expect(e.message).toContain('vpcConfiguration: securityGroups must have at most 5 elements');
       }
     });
 
@@ -1031,7 +1031,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('vpcConfiguration: subnets must have at least 2 items');
+        expect(e.message).toContain('vpcConfiguration: subnets must have at least 2 elements');
       }
     });
 
@@ -1057,7 +1057,7 @@ describe('Workspace', () => {
         });
         throw new Error('Expected error was not thrown');
       } catch (e: any) {
-        expect(e.message).toContain('vpcConfiguration: subnets cannot have more than 6 items');
+        expect(e.message).toContain('vpcConfiguration: subnets must have at most 6 elements');
       }
     });
 
