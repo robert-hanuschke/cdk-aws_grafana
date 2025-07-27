@@ -1,6 +1,7 @@
 import { CfnWorkspace, CfnWorkspaceProps } from 'aws-cdk-lib/aws-grafana';
 import { IRole } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
+import { validateClientToken, validateDescription, validateGrafanaVersion, validateName, validateNetworkAccessControl, validateOrganizationRoleName, validateSamlConfiguration, validateVpcConfiguration } from './validation/workspace-base';
 import {
   AccountAccessType,
   AuthenticationProviders,
@@ -335,459 +336,6 @@ export class Workspace extends WorkspaceBase {
   }
 
   /**
-   * Validates the clientToken property.
-   *
-   * @param token - The client token to validate
-   * @returns An array of error messages if validation fails, or an empty array if valid
-   *
-   * Validation rules:
-   * - Must be a string
-   * - Must be between 1 and 64 characters long
-   * - Must contain only printable ASCII characters
-   */
-  private static validateClientToken(token: unknown): string[] {
-    const errors: string[] = [];
-
-    if (typeof token !== 'string') {
-      errors.push('clientToken must be a string');
-      return errors; // No need to check further if not a string
-    }
-
-    const regex = /^[!-~]{1,64}$/;
-    if (!regex.test(token)) {
-      if (token.length < 1 || token.length > 64) {
-        errors.push('clientToken must be between 1 and 64 characters long');
-      }
-
-      if (!/^[!-~]*$/.test(token)) {
-        errors.push('clientToken must contain only printable ASCII characters');
-      }
-    }
-
-    return errors;
-  }
-
-  /**
-   * Validates the description property.
-   *
-   * @param description - The description to validate
-   * @returns An array of error messages if validation fails, or an empty array if valid
-   *
-   * Validation rules:
-   * - Must be a string
-   * - Maximum length of 2048 characters
-   */
-  private static validateDescription(description: unknown): string[] {
-    const errors: string[] = [];
-
-    if (typeof description !== 'string') {
-      errors.push('description must be a string');
-      return errors; // No need to check further if not a string
-    }
-
-    if (description.length > 2048) {
-      errors.push('description cannot exceed 2048 characters');
-    }
-
-    return errors;
-  }
-
-  /**
-   * Validates the grafanaVersion property.
-   *
-   * @param version - The Grafana version to validate
-   * @returns An array of error messages if validation fails, or an empty array if valid
-   *
-   * Validation rules:
-   * - Must be a string
-   * - Must be between 1 and 255 characters long
-   */
-  private static validateGrafanaVersion(version: unknown): string[] {
-    const errors: string[] = [];
-
-    if (typeof version !== 'string') {
-      errors.push('grafanaVersion must be a string');
-      return errors; // No need to check further if not a string
-    }
-
-    if (version.length < 1) {
-      errors.push('grafanaVersion cannot be empty');
-    }
-
-    if (version.length > 255) {
-      errors.push('grafanaVersion cannot exceed 255 characters');
-    }
-
-    return errors;
-  }
-
-  /**
-   * Validates the name property.
-   *
-   * @param name - The workspace name to validate
-   * @returns An array of error messages if validation fails, or an empty array if valid
-   *
-   * Validation rules:
-   * - Must be a string
-   * - Must be between 1 and 255 characters long
-   * - Can only contain alphanumeric characters, hyphens, dots, underscores, and tildes
-   */
-  private static validateName(name: unknown): string[] {
-    const errors: string[] = [];
-
-    if (typeof name !== 'string') {
-      errors.push('name must be a string');
-      return errors; // No need to check further if not a string
-    }
-
-    const regex = /^[a-zA-Z0-9\-._~]{1,255}$/;
-    if (!regex.test(name)) {
-      if (name.length < 1 || name.length > 255) {
-        errors.push('name must be between 1 and 255 characters long');
-      }
-
-      if (!/^[a-zA-Z0-9\-._~]*$/.test(name)) {
-        errors.push(
-          'name can only contain alphanumeric characters, hyphens, dots, underscores, and tildes',
-        );
-      }
-    }
-
-    return errors;
-  }
-
-  /**
-   * Validates the networkAccessControl property.
-   *
-   * @param nac - The network access control configuration to validate
-   * @returns An array of error messages if validation fails, or an empty array if valid
-   *
-   * Validation rules:
-   * - Must be an object
-   * - prefixLists (if present) must be an array with at most 5 items
-   * - vpcEndpoints (if present) must be an array with at most 5 items
-   */
-  private static validateNetworkAccessControl(nac: unknown): string[] {
-    const errors: string[] = [];
-
-    if (!nac || typeof nac !== 'object') {
-      errors.push('networkAccessControl must be an object');
-      return errors;
-    }
-
-    const networkAccessControl = nac as NetworkAccessControl;
-
-    // Check prefixLists if present
-    if (networkAccessControl.prefixLists !== undefined) {
-      if (!Array.isArray(networkAccessControl.prefixLists)) {
-        errors.push('prefixLists must be an array');
-      } else if (networkAccessControl.prefixLists.length > 5) {
-        errors.push('prefixLists can have at most 5 items');
-      }
-    }
-
-    // Check vpcEndpoints if present
-    if (networkAccessControl.vpcEndpoints !== undefined) {
-      if (!Array.isArray(networkAccessControl.vpcEndpoints)) {
-        errors.push('vpcEndpoints must be an array');
-      } else if (networkAccessControl.vpcEndpoints.length > 5) {
-        errors.push('vpcEndpoints can have at most 5 items');
-      }
-    }
-
-    return errors;
-  }
-
-  /**
-   * Validates the organizationRoleName property.
-   *
-   * @param roleName - The organization role name to validate
-   * @returns An array of error messages if validation fails, or an empty array if valid
-   *
-   * Validation rules:
-   * - Must be a string
-   * - Must be between 1 and 2048 characters long
-   */
-  private static validateOrganizationRoleName(roleName: unknown): string[] {
-    const errors: string[] = [];
-
-    if (typeof roleName !== 'string') {
-      errors.push('organizationRoleName must be a string');
-      return errors; // No need to check further if not a string
-    }
-
-    if (roleName.length < 1) {
-      errors.push('organizationRoleName cannot be empty');
-    }
-
-    if (roleName.length > 2048) {
-      errors.push('organizationRoleName cannot exceed 2048 characters');
-    }
-
-    return errors;
-  }
-
-  /**
-   * Validates the SAML assertion attributes.
-   *
-   * @param obj - The SAML assertion attributes to validate
-   * @returns An array of error messages if validation fails, or an empty array if valid
-   *
-   * Validation rules:
-   * - Must be an object
-   * - Each attribute must be a string
-   * - Each attribute must be between 1 and 256 characters long
-   * - Valid attribute keys are: 'email', 'groups', 'login', 'name', 'org', 'role'
-   */
-  private static validateSamlAssertionAttributes(obj: unknown): string[] {
-    const errors: string[] = [];
-
-    if (!obj || typeof obj !== 'object') {
-      return ['Input is not an object'];
-    }
-
-    const attributes = obj as Record<string, unknown>;
-
-    for (const key in attributes) {
-      const value = attributes[key];
-      if (value === undefined) {
-        continue; // Optional properties can be undefined
-      }
-
-      if (typeof value !== 'string') {
-        errors.push(`Property '${key}' must be a string`);
-      } else if (value.length < 1) {
-        errors.push(`Property '${key}' cannot be empty`);
-      } else if (value.length > 256) {
-        errors.push(
-          `Property '${key}' exceeds maximum length of 256 characters`,
-        );
-      }
-    }
-
-    return errors;
-  }
-
-  /**
-   * Validates the SAML IdP metadata.
-   *
-   * @param obj - The SAML IdP metadata to validate
-   * @returns An array of error messages if validation fails, or an empty array if valid
-   *
-   * Validation rules:
-   * - Must be an object
-   * - url (if present) must be a string between 1 and 2048 characters long
-   * - xml (if present) must be a string
-   */
-  private static validateSamlIdpMetadata(obj: unknown): string[] {
-    const errors: string[] = [];
-
-    if (!obj || typeof obj !== 'object') {
-      return ['Input is not an object'];
-    }
-
-    const metadata = obj as Record<string, unknown>;
-
-    // Check url property if present
-    if (metadata.url !== undefined) {
-      if (typeof metadata.url !== 'string') {
-        errors.push("Property 'url' must be a string");
-      } else if (metadata.url.length < 1) {
-        errors.push("Property 'url' cannot be empty");
-      } else if (metadata.url.length > 2048) {
-        errors.push("Property 'url' exceeds maximum length of 2048 characters");
-      }
-    }
-
-    // Check xml property if present
-    if (metadata.xml !== undefined && typeof metadata.xml !== 'string') {
-      errors.push("Property 'xml' must be a string");
-    }
-
-    return errors;
-  }
-
-  /**
-   * Validates the SAML configuration.
-   *
-   * @param config - The SAML configuration to validate
-   * @returns An array of error messages if validation fails, or an empty array if valid
-   *
-   * Validation rules:
-   * - Must be an object
-   * - idpMetadata is required and must be valid
-   * - assertionAtrributes (if present) must be valid
-   * - allowedOrganizations (if present) must be an array of strings with 1-256 elements
-   * - loginValidityDuration (if present) must be a positive number
-   * - roleValues (if present) must be an object with valid admin and editor arrays
-   */
-  private static validateSamlConfiguration(config: unknown): string[] {
-    const errors: string[] = [];
-
-    if (!config || typeof config !== 'object') {
-      errors.push('samlConfiguration must be an object');
-      return errors;
-    }
-
-    const samlConfig = config as SamlConfiguration;
-
-    // Check idpMetadata (required)
-    if (samlConfig.idpMetadata === undefined) {
-      errors.push('idpMetadata is required in samlConfiguration');
-    } else {
-      const idpMetadataErrors = Workspace.validateSamlIdpMetadata(
-        samlConfig.idpMetadata,
-      );
-      if (idpMetadataErrors.length > 0) {
-        errors.push(...idpMetadataErrors.map((err) => `idpMetadata: ${err}`));
-      }
-    }
-
-    // Check assertionAtrributes if present
-    if (samlConfig.assertionAtrributes !== undefined) {
-      const attributeErrors = Workspace.validateSamlAssertionAttributes(
-        samlConfig.assertionAtrributes,
-      );
-      if (attributeErrors.length > 0) {
-        errors.push(
-          ...attributeErrors.map((err) => `assertionAtrributes: ${err}`),
-        );
-      }
-    }
-
-    // Check allowedOrganizations if present
-    if (samlConfig.allowedOrganizations !== undefined) {
-      if (!Array.isArray(samlConfig.allowedOrganizations)) {
-        errors.push('allowedOrganizations must be an array');
-      } else {
-        if (samlConfig.allowedOrganizations.length < 1) {
-          errors.push('allowedOrganizations must have at least 1 element');
-        }
-        if (samlConfig.allowedOrganizations.length > 256) {
-          errors.push(
-            'allowedOrganizations cannot have more than 256 elements',
-          );
-        }
-
-        for (let i = 0; i < samlConfig.allowedOrganizations.length; i++) {
-          const org = samlConfig.allowedOrganizations[i];
-          if (typeof org !== 'string') {
-            errors.push(`allowedOrganizations[${i}] must be a string`);
-          }
-        }
-      }
-    }
-
-    // Check loginValidityDuration if present
-    if (samlConfig.loginValidityDuration !== undefined) {
-      if (typeof samlConfig.loginValidityDuration !== 'number') {
-        errors.push('loginValidityDuration must be a number');
-      } else if (samlConfig.loginValidityDuration <= 0) {
-        errors.push('loginValidityDuration must be positive');
-      }
-    }
-
-    // Check roleValues if present
-    if (samlConfig.roleValues !== undefined) {
-      if (!samlConfig.roleValues || typeof samlConfig.roleValues !== 'object') {
-        errors.push('roleValues must be an object');
-      } else {
-        // Check admin array if present
-        if (samlConfig.roleValues.admin !== undefined) {
-          if (!Array.isArray(samlConfig.roleValues.admin)) {
-            errors.push('roleValues.admin must be an array');
-          } else {
-            for (let i = 0; i < samlConfig.roleValues.admin.length; i++) {
-              if (typeof samlConfig.roleValues.admin[i] !== 'string') {
-                errors.push(`roleValues.admin[${i}] must be a string`);
-              }
-            }
-
-            if (samlConfig.roleValues.admin.length > 256) {
-              errors.push(
-                'roleValues.admin cannot have more than 256 elements',
-              );
-            }
-          }
-        }
-
-        // Check editor array if present
-        if (samlConfig.roleValues.editor !== undefined) {
-          if (!Array.isArray(samlConfig.roleValues.editor)) {
-            errors.push('roleValues.editor must be an array');
-          } else {
-            for (let i = 0; i < samlConfig.roleValues.editor.length; i++) {
-              if (typeof samlConfig.roleValues.editor[i] !== 'string') {
-                errors.push(`roleValues.editor[${i}] must be a string`);
-              }
-            }
-
-            if (samlConfig.roleValues.editor.length > 256) {
-              errors.push(
-                'roleValues.editor cannot have more than 256 elements',
-              );
-            }
-          }
-        }
-      }
-    }
-
-    return errors;
-  }
-
-  /**
-   * Validates the vpcConfiguration property.
-   *
-   * @param config - The VPC configuration to validate
-   * @returns An array of error messages if validation fails, or an empty array if valid
-   *
-   * Validation rules:
-   * - Must be an object
-   * - securityGroups is required and must be an array with 1-5 items
-   * - subnets is required and must be an array with 2-6 items
-   */
-  private static validateVpcConfiguration(config: unknown): string[] {
-    const errors: string[] = [];
-
-    if (!config || typeof config !== 'object') {
-      errors.push('vpcConfiguration must be an object');
-      return errors;
-    }
-
-    const vpcConfig = config as VpcConfiguration;
-
-    // Check securityGroups (required)
-    if (vpcConfig.securityGroups === undefined) {
-      errors.push('securityGroups is required in vpcConfiguration');
-    } else if (!Array.isArray(vpcConfig.securityGroups)) {
-      errors.push('securityGroups must be an array');
-    } else {
-      if (vpcConfig.securityGroups.length < 1) {
-        errors.push('securityGroups must have at least 1 item');
-      }
-      if (vpcConfig.securityGroups.length > 5) {
-        errors.push('securityGroups cannot have more than 5 items');
-      }
-    }
-
-    // Check subnets (required)
-    if (vpcConfig.subnets === undefined) {
-      errors.push('subnets is required in vpcConfiguration');
-    } else if (!Array.isArray(vpcConfig.subnets)) {
-      errors.push('subnets must be an array');
-    } else {
-      if (vpcConfig.subnets.length < 2) {
-        errors.push('subnets must have at least 2 items');
-      }
-      if (vpcConfig.subnets.length > 6) {
-        errors.push('subnets cannot have more than 6 items');
-      }
-    }
-
-    return errors;
-  }
-
-  /**
    * Validates all workspace properties.
    *
    * @param props - The workspace properties to validate
@@ -805,7 +353,7 @@ export class Workspace extends WorkspaceBase {
     const workspaceProps = props as WorkspaceProps;
 
     if (workspaceProps.clientToken !== undefined) {
-      const clientTokenErrors = Workspace.validateClientToken(
+      const clientTokenErrors = validateClientToken(
         workspaceProps.clientToken,
       );
       if (clientTokenErrors.length > 0) {
@@ -814,7 +362,7 @@ export class Workspace extends WorkspaceBase {
     }
 
     if (workspaceProps.description !== undefined) {
-      const descriptionErrors = Workspace.validateDescription(
+      const descriptionErrors = validateDescription(
         workspaceProps.description,
       );
       if (descriptionErrors.length > 0) {
@@ -823,7 +371,7 @@ export class Workspace extends WorkspaceBase {
     }
 
     if (workspaceProps.grafanaVersion !== undefined) {
-      const grafanaVersionErrors = Workspace.validateGrafanaVersion(
+      const grafanaVersionErrors = validateGrafanaVersion(
         workspaceProps.grafanaVersion,
       );
       if (grafanaVersionErrors.length > 0) {
@@ -834,14 +382,14 @@ export class Workspace extends WorkspaceBase {
     }
 
     if (workspaceProps.name !== undefined) {
-      const nameErrors = Workspace.validateName(workspaceProps.name);
+      const nameErrors = validateName(workspaceProps.name);
       if (nameErrors.length > 0) {
         errors.push(...nameErrors.map((err) => `name: ${err}`));
       }
     }
 
     if (workspaceProps.networkAccessControl !== undefined) {
-      const networkAccessControlErrors = Workspace.validateNetworkAccessControl(
+      const networkAccessControlErrors = validateNetworkAccessControl(
         workspaceProps.networkAccessControl,
       );
       if (networkAccessControlErrors.length > 0) {
@@ -854,7 +402,7 @@ export class Workspace extends WorkspaceBase {
     }
 
     if (workspaceProps.organizationRoleName !== undefined) {
-      const organizationRoleNameErrors = Workspace.validateOrganizationRoleName(
+      const organizationRoleNameErrors = validateOrganizationRoleName(
         workspaceProps.organizationRoleName,
       );
       if (organizationRoleNameErrors.length > 0) {
@@ -867,7 +415,7 @@ export class Workspace extends WorkspaceBase {
     }
 
     if (workspaceProps.samlConfiguration !== undefined) {
-      const samlConfigurationErrors = Workspace.validateSamlConfiguration(
+      const samlConfigurationErrors = validateSamlConfiguration(
         workspaceProps.samlConfiguration,
       );
       if (samlConfigurationErrors.length > 0) {
@@ -878,7 +426,7 @@ export class Workspace extends WorkspaceBase {
     }
 
     if (workspaceProps.vpcConfiguration !== undefined) {
-      const vpcConfigurationErrors = Workspace.validateVpcConfiguration(
+      const vpcConfigurationErrors = validateVpcConfiguration(
         workspaceProps.vpcConfiguration,
       );
       if (vpcConfigurationErrors.length > 0) {
