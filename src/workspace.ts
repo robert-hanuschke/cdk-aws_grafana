@@ -280,12 +280,17 @@ export interface WorkspaceAttributes {
   readonly workspaceArn: string;
 };
 
+const IS_WORKSPACE = Symbol.for('@robhan-cdk-lib/aws_grafana.Workspace');
+
 /**
  * Specifies a workspace. In a workspace, you can create Grafana dashboards and visualizations to
  * analyze your metrics, logs, and traces. You don't have to build, package, or deploy any hardware
  * to run the Grafana server.
  */
 export class Workspace extends WorkspaceBase {
+  public static isWorkspace(x: any): x is Workspace {
+    return IS_WORKSPACE in x;
+  }
 
   public static fromWorkspaceAttributes(scope: Construct, id: string, attrs: WorkspaceAttributes): IWorkspace {
     class Import extends WorkspaceBase {
@@ -598,6 +603,8 @@ export class Workspace extends WorkspaceBase {
 
   constructor(scope: Construct, id: string, props: WorkspaceProps) {
     super(scope, id);
+
+    Object.defineProperty(this, IS_WORKSPACE, { value: true });
 
     const errors = Workspace.validateProps(props);
 

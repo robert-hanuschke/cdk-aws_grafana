@@ -1073,4 +1073,16 @@ describe('Workspace', () => {
       expect(workspace.workspaceArn).toEqual(workspaceArn);
     });
   });
+
+  describe('isWorkspace', () => {
+    test('should return true for workspace', () => {
+      const workspace = new Workspace(stack, 'Workspace', {
+        accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
+        authenticationProviders: [AuthenticationProviders.AWS_SSO],
+        permissionType: PermissionTypes.CUSTOMER_MANAGED,
+        role,
+      });
+      expect(Workspace.isWorkspace(workspace)).toBe(true);
+    });
+  });
 });
