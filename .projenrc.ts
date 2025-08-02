@@ -15,7 +15,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
       labels: ['auto-approve', 'auto-merge'],
     },
   },
-  description: 'AWS CDK Construct Library for Grafana',
+  description: 'AWS CDK Construct Library for Amazon Managed Grafana',
   jsiiVersion: '~5.8.0',
   keywords: ['grafana'],
   license: 'MIT',

@@ -91,6 +91,7 @@ account for data recovery and cleanup later (`RemovalPolicy.RETAIN`).
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.isOwnedResource">isOwnedResource</a></code> | Returns true if the construct was created by CDK, and false otherwise. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.isResource">isResource</a></code> | Check whether the given construct is a Resource. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.fromWorkspaceAttributes">fromWorkspaceAttributes</a></code> | *No description.* |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.isWorkspace">isWorkspace</a></code> | *No description.* |
 
 ---
 
@@ -167,6 +168,20 @@ Workspace.fromWorkspaceAttributes(scope: Construct, id: string, attrs: Workspace
 ###### `attrs`<sup>Required</sup> <a name="attrs" id="@robhan-cdk-lib/aws_grafana.Workspace.fromWorkspaceAttributes.parameter.attrs"></a>
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.WorkspaceAttributes">WorkspaceAttributes</a>
+
+---
+
+##### `isWorkspace` <a name="isWorkspace" id="@robhan-cdk-lib/aws_grafana.Workspace.isWorkspace"></a>
+
+```typescript
+import { Workspace } from '@robhan-cdk-lib/aws_grafana'
+
+Workspace.isWorkspace(x: any)
+```
+
+###### `x`<sup>Required</sup> <a name="x" id="@robhan-cdk-lib/aws_grafana.Workspace.isWorkspace.parameter.x"></a>
+
+- *Type:* any
 
 ---
 
