@@ -26,12 +26,12 @@ const project = new awscdk.AwsCdkConstructLibrary({
   publishToGo: {
     moduleName: 'github.com/robert-hanuschke/robhan-cdk-lib-aws-grafana',
   },
-  publishToMaven: {
-    javaPackage: 'io.github.roberthanuschke.cdk.aws.grafana',
-    mavenGroupId: 'io.github.robert-hanuschke',
-    mavenArtifactId: 'cdk-aws-grafana',
-    mavenServerId: 'central-ossrh',
-  },
+  /*   publishToMaven: {
+      javaPackage: 'io.github.roberthanuschke.cdk.aws.grafana',
+      mavenGroupId: 'io.github.robert-hanuschke',
+      mavenArtifactId: 'cdk-aws-grafana',
+      mavenServerId: 'central-ossrh',
+    }, */
   publishToNuget: {
     dotNetNamespace: 'Robhan.CdkLib',
     packageId: 'Robhan.CdkLib.AwsGrafana',
