@@ -204,7 +204,7 @@ Workspace.isWorkspace(x: any)
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.env">env</a></code> | <code>aws-cdk-lib.ResourceEnvironment</code> | The environment this resource belongs to. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this resource belongs to. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.stack">stack</a></code> | <code>aws-cdk-lib.Stack</code> | The stack in which this resource is defined. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.accountAccessType">accountAccessType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a></code> | Specifies whether the workspace can access AWS resources in this AWS account only, or whether it can also access AWS resources in other accounts in the same organization. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.authenticationProviders">authenticationProviders</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]</code> | Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to authenticate users for using the Grafana console within a workspace. |
@@ -252,16 +252,17 @@ The tree node.
 public readonly env: ResourceEnvironment;
 ```
 
-- *Type:* aws-cdk-lib.ResourceEnvironment
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
 
 The environment this resource belongs to.
 
-For resources that are created and managed by the CDK
-(generally, those created by creating new class instances like Role, Bucket, etc.),
-this is always the same as the environment of the stack they belong to;
-however, for imported resources
-(those obtained from static methods like fromRoleArn, fromBucketName, etc.),
-that might be different than the stack they were imported into.
+For resources that are created and managed in a Stack (those created by
+creating new class instances like `new Role()`, `new Bucket()`, etc.), this
+is always the same as the environment of the stack they belong to.
+
+For referenced resources (those obtained from referencing methods like
+`Role.fromRoleArn()`, `Bucket.fromBucketName()`, etc.), they might be
+different than the stack they were imported into.
 
 ---
 
@@ -752,7 +753,7 @@ Check whether the given construct is a Resource.
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.env">env</a></code> | <code>aws-cdk-lib.ResourceEnvironment</code> | The environment this resource belongs to. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this resource belongs to. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.stack">stack</a></code> | <code>aws-cdk-lib.Stack</code> | The stack in which this resource is defined. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.accountAccessType">accountAccessType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a></code> | The account access type for the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.authenticationProviders">authenticationProviders</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]</code> | The authentication providers for the workspace. |
@@ -793,16 +794,17 @@ The tree node.
 public readonly env: ResourceEnvironment;
 ```
 
-- *Type:* aws-cdk-lib.ResourceEnvironment
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
 
 The environment this resource belongs to.
 
-For resources that are created and managed by the CDK
-(generally, those created by creating new class instances like Role, Bucket, etc.),
-this is always the same as the environment of the stack they belong to;
-however, for imported resources
-(those obtained from static methods like fromRoleArn, fromBucketName, etc.),
-that might be different than the stack they were imported into.
+For resources that are created and managed in a Stack (those created by
+creating new class instances like `new Role()`, `new Bucket()`, etc.), this
+is always the same as the environment of the stack they belong to.
+
+For referenced resources (those obtained from referencing methods like
+`Role.fromRoleArn()`, `Bucket.fromBucketName()`, etc.), they might be
+different than the stack they were imported into.
 
 ---
 
@@ -2027,7 +2029,7 @@ Represents an Amazon Managed Service for Grafana workspace.
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.env">env</a></code> | <code>aws-cdk-lib.ResourceEnvironment</code> | The environment this resource belongs to. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this resource belongs to. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.stack">stack</a></code> | <code>aws-cdk-lib.Stack</code> | The stack in which this resource is defined. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.accountAccessType">accountAccessType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a></code> | Specifies whether the workspace can access AWS resources in this AWS account only, or whether it can also access AWS resources in other accounts in the same organization. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.authenticationProviders">authenticationProviders</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]</code> | Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to authenticate users for using the Grafana console within a workspace. |
@@ -2068,16 +2070,17 @@ The tree node.
 public readonly env: ResourceEnvironment;
 ```
 
-- *Type:* aws-cdk-lib.ResourceEnvironment
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
 
 The environment this resource belongs to.
 
-For resources that are created and managed by the CDK
-(generally, those created by creating new class instances like Role, Bucket, etc.),
-this is always the same as the environment of the stack they belong to;
-however, for imported resources
-(those obtained from static methods like fromRoleArn, fromBucketName, etc.),
-that might be different than the stack they were imported into.
+For resources that are created and managed in a Stack (those created by
+creating new class instances like `new Role()`, `new Bucket()`, etc.), this
+is always the same as the environment of the stack they belong to.
+
+For referenced resources (those obtained from referencing methods like
+`Role.fromRoleArn()`, `Bucket.fromBucketName()`, etc.), they might be
+different than the stack they were imported into.
 
 ---
 

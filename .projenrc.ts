@@ -7,7 +7,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
     secret: 'GITHUB_TOKEN',
   },
   autoApproveUpgrades: true,
-  cdkVersion: '2.198.0',
+  cdkVersion: '2.224.0',
   defaultReleaseBranch: 'main',
   deps: ['@robhan-cdk-lib/utils'],
   depsUpgradeOptions: {
@@ -16,7 +16,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
     },
   },
   description: 'AWS CDK Construct Library for Amazon Managed Grafana',
-  jsiiVersion: '~5.8.0',
+  jsiiVersion: '~5.9.0',
   keywords: ['grafana'],
   license: 'MIT',
   name: 'aws_grafana',
@@ -26,12 +26,12 @@ const project = new awscdk.AwsCdkConstructLibrary({
   publishToGo: {
     moduleName: 'github.com/robert-hanuschke/robhan-cdk-lib-aws-grafana',
   },
-  /*   publishToMaven: {
-      javaPackage: 'io.github.roberthanuschke.cdk.aws.grafana',
-      mavenGroupId: 'io.github.robert-hanuschke',
-      mavenArtifactId: 'cdk-aws-grafana',
-      mavenServerId: 'central-ossrh',
-    }, */
+  publishToMaven: {
+    javaPackage: 'io.github.roberthanuschke.cdk.aws.grafana',
+    mavenGroupId: 'io.github.robert-hanuschke',
+    mavenArtifactId: 'cdk-aws-grafana',
+    mavenServerId: 'central-ossrh',
+  },
   publishToNuget: {
     dotNetNamespace: 'Robhan.CdkLib',
     packageId: 'Robhan.CdkLib.AwsGrafana',
