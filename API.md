@@ -79,8 +79,6 @@ constructs.
 
 - *Type:* ...constructs.IMixin[]
 
-The mixins to apply.
-
 ---
 
 ##### `applyRemovalPolicy` <a name="applyRemovalPolicy" id="@robhan-cdk-lib/aws_grafana.Workspace.applyRemovalPolicy"></a>
@@ -691,8 +689,6 @@ constructs.
 ###### `mixins`<sup>Required</sup> <a name="mixins" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.with.parameter.mixins"></a>
 
 - *Type:* ...constructs.IMixin[]
-
-The mixins to apply.
 
 ---
 
