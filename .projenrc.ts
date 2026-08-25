@@ -7,15 +7,17 @@ const project = new awscdk.AwsCdkConstructLibrary({
     secret: 'GITHUB_TOKEN',
   },
   autoApproveUpgrades: true,
-  cdkVersion: '2.243.0',
+  cdkVersion: '2.266.0',
   defaultReleaseBranch: 'main',
-  deps: ['@robhan-cdk-lib/utils'],
   depsUpgradeOptions: {
     workflowOptions: {
-      labels: ['auto-approve', 'auto-merge'],
+      labels: ['auto-approve'],
     },
   },
   description: 'AWS CDK Construct Library for Amazon Managed Grafana',
+  // Integration-test framework (core convention). Pinned to the alpha train that matches the
+  // aws-cdk-lib version above (2.266.0 -> 2.266.0-alpha.0).
+  devDeps: ['@aws-cdk/integ-tests-alpha@2.266.0-alpha.0'],
   jsiiVersion: '~5.9.0',
   keywords: ['grafana'],
   license: 'MIT',

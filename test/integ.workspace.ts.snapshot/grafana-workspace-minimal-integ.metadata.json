@@ -1,0 +1,37 @@
+{
+  "/grafana-workspace-minimal-integ/WorkspaceRole": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "assumedBy": {
+          "principalAccount": "*",
+          "assumeRoleAction": "*"
+        }
+      }
+    }
+  ],
+  "/grafana-workspace-minimal-integ/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/grafana-workspace-minimal-integ/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/grafana-workspace-minimal-integ/WorkspaceRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WorkspaceRole736431E1"
+    }
+  ],
+  "/grafana-workspace-minimal-integ/Workspace/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "Workspace2F8C78CC"
+    }
+  ]
+}

@@ -50,6 +50,7 @@ new Workspace(scope: Construct, id: string, props: WorkspaceProps)
 | --- | --- |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.toString">toString</a></code> | Returns a string representation of this construct. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.applyCrossStackReferenceStrength">applyCrossStackReferenceStrength</a></code> | Override the cross-stack reference strength for this resource. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.applyRemovalPolicy">applyRemovalPolicy</a></code> | Apply the given removal policy to this resource. |
 
 ---
@@ -78,6 +79,28 @@ constructs.
 ###### `mixins`<sup>Required</sup> <a name="mixins" id="@robhan-cdk-lib/aws_grafana.Workspace.with.parameter.mixins"></a>
 
 - *Type:* ...constructs.IMixin[]
+
+---
+
+##### `applyCrossStackReferenceStrength` <a name="applyCrossStackReferenceStrength" id="@robhan-cdk-lib/aws_grafana.Workspace.applyCrossStackReferenceStrength"></a>
+
+```typescript
+public applyCrossStackReferenceStrength(strength: ReferenceStrength): void
+```
+
+Override the cross-stack reference strength for this resource.
+
+When set, any cross-stack reference to this resource will use the specified
+mechanism instead of the global default determined by the
+`@aws-cdk/core:defaultCrossStackReferences` context key. This is useful for
+selectively weakening specific references to avoid the "deadly embrace" problem
+without changing the app-wide default.
+
+###### `strength`<sup>Required</sup> <a name="strength" id="@robhan-cdk-lib/aws_grafana.Workspace.applyCrossStackReferenceStrength.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use for this resource.
 
 ---
 
@@ -110,6 +133,7 @@ account for data recovery and cleanup later (`RemovalPolicy.RETAIN`).
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.isOwnedResource">isOwnedResource</a></code> | Returns true if the construct was created by CDK, and false otherwise. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.isResource">isResource</a></code> | Check whether the given construct is a Resource. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.fromWorkspaceArn">fromWorkspaceArn</a></code> | Import an existing workspace from its ARN. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.fromWorkspaceAttributes">fromWorkspaceAttributes</a></code> | *No description.* |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.isWorkspace">isWorkspace</a></code> | *No description.* |
 
@@ -179,6 +203,45 @@ Check whether the given construct is a Resource.
 
 ---
 
+##### `fromWorkspaceArn` <a name="fromWorkspaceArn" id="@robhan-cdk-lib/aws_grafana.Workspace.fromWorkspaceArn"></a>
+
+```typescript
+import { Workspace } from '@robhan-cdk-lib/aws_grafana'
+
+Workspace.fromWorkspaceArn(scope: Construct, id: string, workspaceArn: string)
+```
+
+Import an existing workspace from its ARN.
+
+A single ARN is the most common handle for referencing an existing workspace. The imported
+workspace only exposes identity information (`workspaceArn` and `workspaceId`); the create-time
+configuration properties are not available on an ARN import. Use `fromWorkspaceAttributes` when
+those properties are required.
+
+###### `scope`<sup>Required</sup> <a name="scope" id="@robhan-cdk-lib/aws_grafana.Workspace.fromWorkspaceArn.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+The parent construct.
+
+---
+
+###### `id`<sup>Required</sup> <a name="id" id="@robhan-cdk-lib/aws_grafana.Workspace.fromWorkspaceArn.parameter.id"></a>
+
+- *Type:* string
+
+The construct id.
+
+---
+
+###### `workspaceArn`<sup>Required</sup> <a name="workspaceArn" id="@robhan-cdk-lib/aws_grafana.Workspace.fromWorkspaceArn.parameter.workspaceArn"></a>
+
+- *Type:* string
+
+The ARN of the existing workspace.
+
+---
+
 ##### `fromWorkspaceAttributes` <a name="fromWorkspaceAttributes" id="@robhan-cdk-lib/aws_grafana.Workspace.fromWorkspaceAttributes"></a>
 
 ```typescript
@@ -226,31 +289,31 @@ Workspace.isWorkspace(x: any)
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this resource belongs to. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.stack">stack</a></code> | <code>aws-cdk-lib.Stack</code> | The stack in which this resource is defined. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.accountAccessType">accountAccessType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a></code> | Specifies whether the workspace can access AWS resources in this AWS account only, or whether it can also access AWS resources in other accounts in the same organization. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.authenticationProviders">authenticationProviders</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]</code> | Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to authenticate users for using the Grafana console within a workspace. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.permissionType">permissionType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes">PermissionTypes</a></code> | If this is SERVICE_MANAGED, and the workplace was created through the Amazon Managed Grafana console, then Amazon Managed Grafana automatically creates the IAM roles and provisions the permissions that the workspace needs to use AWS data sources and notification channels. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.workspaceArn">workspaceArn</a></code> | <code>string</code> | The arn of this workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.workspaceId">workspaceId</a></code> | <code>string</code> | The unique ID of this workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.accountAccessType">accountAccessType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a></code> | Specifies whether the workspace can access AWS resources in this AWS account only, or whether it can also access AWS resources in other accounts in the same organization. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.authenticationProviders">authenticationProviders</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]</code> | Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to authenticate users for using the Grafana console within a workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.clientToken">clientToken</a></code> | <code>string</code> | A unique, case-sensitive, user-provided identifier to ensure the idempotency of the request. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.creationTimestamp">creationTimestamp</a></code> | <code>string</code> | The date that the workspace was created. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.dataSources">dataSources</a></code> | <code>string[]</code> | Specifies the AWS data sources that have been configured to have IAM roles and permissions created to allow Amazon Managed Grafana to read data from these sources. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.description">description</a></code> | <code>string</code> | The user-defined description of the workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.endpoint">endpoint</a></code> | <code>string</code> | The URL that users can use to access the Grafana console in the workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.grafanaVersion">grafanaVersion</a></code> | <code>string</code> | Specifies the version of Grafana supported by this workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.modificationTimestamp">modificationTimestamp</a></code> | <code>string</code> | The most recent date that the workspace was modified. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.name">name</a></code> | <code>string</code> | The name of the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.networkAccessControl">networkAccessControl</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.NetworkAccessControl">NetworkAccessControl</a></code> | The configuration settings for network access to your workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.notificationDestinations">notificationDestinations</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.NotificationDestinations">NotificationDestinations</a>[]</code> | The AWS notification channels that Amazon Managed Grafana can automatically create IAM roles and permissions for, to allow Amazon Managed Grafana to use these channels. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.organizationalUnits">organizationalUnits</a></code> | <code>string[]</code> | Specifies the organizational units that this workspace is allowed to use data sources from, if this workspace is in an account that is part of an organization. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.organizationRoleName">organizationRoleName</a></code> | <code>string</code> | The name of the IAM role that is used to access resources through Organizations. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.permissionType">permissionType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes">PermissionTypes</a></code> | If this is SERVICE_MANAGED, and the workplace was created through the Amazon Managed Grafana console, then Amazon Managed Grafana automatically creates the IAM roles and provisions the permissions that the workspace needs to use AWS data sources and notification channels. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.pluginAdminEnabled">pluginAdminEnabled</a></code> | <code>boolean</code> | Whether plugin administration is enabled in the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.role">role</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | The IAM role that grants permissions to the AWS resources that the workspace will view data from. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.samlConfiguration">samlConfiguration</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration">SamlConfiguration</a></code> | If the workspace uses SAML, use this structure to map SAML assertion attributes to workspace user information and define which groups in the assertion attribute are to have the Admin and Editor roles in the workspace. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.stackSetName">stackSetName</a></code> | <code>string</code> | The name of the AWS CloudFormation stack set that is used to generate IAM roles to be used for this workspace. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.vpcConfiguration">vpcConfiguration</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.VpcConfiguration">VpcConfiguration</a></code> | The configuration settings for an Amazon VPC that contains data sources for your Grafana workspace to connect to. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.creationTimestamp">creationTimestamp</a></code> | <code>string</code> | The date that the workspace was created. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.endpoint">endpoint</a></code> | <code>string</code> | The URL that users can use to access the Grafana console in the workspace. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.grafanaVersion">grafanaVersion</a></code> | <code>string</code> | Specifies the version of Grafana supported by this workspace. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.modificationTimestamp">modificationTimestamp</a></code> | <code>string</code> | The most recent date that the workspace was modified. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.samlConfigurationStatus">samlConfigurationStatus</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.SamlConfigurationStatuses">SamlConfigurationStatuses</a></code> | Specifies whether the workspace's SAML configuration is complete. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.samlConfigurationStatus">samlConfigurationStatus</a></code> | <code>string</code> | Specifies whether the workspace's SAML configuration is complete. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.ssoClientId">ssoClientId</a></code> | <code>string</code> | The ID of the IAM Identity Center-managed application that is created by Amazon Managed Grafana. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.status">status</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.Status">Status</a></code> | The current status of the workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.stackSetName">stackSetName</a></code> | <code>string</code> | The name of the AWS CloudFormation stack set that is used to generate IAM roles to be used for this workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.status">status</a></code> | <code>string</code> | The current status of the workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.Workspace.property.vpcConfiguration">vpcConfiguration</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.VpcConfiguration">VpcConfiguration</a></code> | The configuration settings for an Amazon VPC that contains data sources for your Grafana workspace to connect to. |
 
 ---
 
@@ -298,52 +361,6 @@ The stack in which this resource is defined.
 
 ---
 
-##### `accountAccessType`<sup>Required</sup> <a name="accountAccessType" id="@robhan-cdk-lib/aws_grafana.Workspace.property.accountAccessType"></a>
-
-```typescript
-public readonly accountAccessType: AccountAccessType;
-```
-
-- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a>
-
-Specifies whether the workspace can access AWS resources in this AWS account only, or whether it can also access AWS resources in other accounts in the same organization.
-
-If this is
-ORGANIZATION, the OrganizationalUnits parameter specifies which organizational units the
-workspace can access.
-
----
-
-##### `authenticationProviders`<sup>Required</sup> <a name="authenticationProviders" id="@robhan-cdk-lib/aws_grafana.Workspace.property.authenticationProviders"></a>
-
-```typescript
-public readonly authenticationProviders: AuthenticationProviders[];
-```
-
-- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]
-
-Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to authenticate users for using the Grafana console within a workspace.
-
----
-
-##### `permissionType`<sup>Required</sup> <a name="permissionType" id="@robhan-cdk-lib/aws_grafana.Workspace.property.permissionType"></a>
-
-```typescript
-public readonly permissionType: PermissionTypes;
-```
-
-- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes">PermissionTypes</a>
-
-If this is SERVICE_MANAGED, and the workplace was created through the Amazon Managed Grafana console, then Amazon Managed Grafana automatically creates the IAM roles and provisions the permissions that the workspace needs to use AWS data sources and notification channels.
-
-If this is CUSTOMER_MANAGED, you must manage those roles and permissions yourself.
-
-If you are working with a workspace in a member account of an organization and that account is
-not a delegated administrator account, and you want the workspace to access data sources in
-other AWS accounts in the organization, this parameter must be set to CUSTOMER_MANAGED.
-
----
-
 ##### `workspaceArn`<sup>Required</sup> <a name="workspaceArn" id="@robhan-cdk-lib/aws_grafana.Workspace.property.workspaceArn"></a>
 
 ```typescript
@@ -368,6 +385,38 @@ The unique ID of this workspace.
 
 ---
 
+##### `accountAccessType`<sup>Optional</sup> <a name="accountAccessType" id="@robhan-cdk-lib/aws_grafana.Workspace.property.accountAccessType"></a>
+
+```typescript
+public readonly accountAccessType: AccountAccessType;
+```
+
+- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a>
+
+Specifies whether the workspace can access AWS resources in this AWS account only, or whether it can also access AWS resources in other accounts in the same organization.
+
+If this is
+ORGANIZATION, the OrganizationalUnits parameter specifies which organizational units the
+workspace can access.
+
+Always populated for a workspace created through this construct (it is a required prop).
+
+---
+
+##### `authenticationProviders`<sup>Optional</sup> <a name="authenticationProviders" id="@robhan-cdk-lib/aws_grafana.Workspace.property.authenticationProviders"></a>
+
+```typescript
+public readonly authenticationProviders: AuthenticationProviders[];
+```
+
+- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]
+
+Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to authenticate users for using the Grafana console within a workspace.
+
+Always populated for a workspace created through this construct (it is a required prop).
+
+---
+
 ##### `clientToken`<sup>Optional</sup> <a name="clientToken" id="@robhan-cdk-lib/aws_grafana.Workspace.property.clientToken"></a>
 
 ```typescript
@@ -377,6 +426,18 @@ public readonly clientToken: string;
 - *Type:* string
 
 A unique, case-sensitive, user-provided identifier to ensure the idempotency of the request.
+
+---
+
+##### `creationTimestamp`<sup>Optional</sup> <a name="creationTimestamp" id="@robhan-cdk-lib/aws_grafana.Workspace.property.creationTimestamp"></a>
+
+```typescript
+public readonly creationTimestamp: string;
+```
+
+- *Type:* string
+
+The date that the workspace was created.
 
 ---
 
@@ -404,6 +465,42 @@ public readonly description: string;
 - *Type:* string
 
 The user-defined description of the workspace.
+
+---
+
+##### `endpoint`<sup>Optional</sup> <a name="endpoint" id="@robhan-cdk-lib/aws_grafana.Workspace.property.endpoint"></a>
+
+```typescript
+public readonly endpoint: string;
+```
+
+- *Type:* string
+
+The URL that users can use to access the Grafana console in the workspace.
+
+---
+
+##### `grafanaVersion`<sup>Optional</sup> <a name="grafanaVersion" id="@robhan-cdk-lib/aws_grafana.Workspace.property.grafanaVersion"></a>
+
+```typescript
+public readonly grafanaVersion: string;
+```
+
+- *Type:* string
+
+Specifies the version of Grafana supported by this workspace.
+
+---
+
+##### `modificationTimestamp`<sup>Optional</sup> <a name="modificationTimestamp" id="@robhan-cdk-lib/aws_grafana.Workspace.property.modificationTimestamp"></a>
+
+```typescript
+public readonly modificationTimestamp: string;
+```
+
+- *Type:* string
+
+The most recent date that the workspace was modified.
 
 ---
 
@@ -467,6 +564,26 @@ The name of the IAM role that is used to access resources through Organizations.
 
 ---
 
+##### `permissionType`<sup>Optional</sup> <a name="permissionType" id="@robhan-cdk-lib/aws_grafana.Workspace.property.permissionType"></a>
+
+```typescript
+public readonly permissionType: PermissionTypes;
+```
+
+- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes">PermissionTypes</a>
+
+If this is SERVICE_MANAGED, and the workplace was created through the Amazon Managed Grafana console, then Amazon Managed Grafana automatically creates the IAM roles and provisions the permissions that the workspace needs to use AWS data sources and notification channels.
+
+If this is CUSTOMER_MANAGED, you must manage those roles and permissions yourself.
+
+If you are working with a workspace in a member account of an organization and that account is
+not a delegated administrator account, and you want the workspace to access data sources in
+other AWS accounts in the organization, this parameter must be set to CUSTOMER_MANAGED.
+
+Always populated for a workspace created through this construct (it is a required prop).
+
+---
+
 ##### `pluginAdminEnabled`<sup>Optional</sup> <a name="pluginAdminEnabled" id="@robhan-cdk-lib/aws_grafana.Workspace.property.pluginAdminEnabled"></a>
 
 ```typescript
@@ -508,6 +625,33 @@ If the workspace uses SAML, use this structure to map SAML assertion attributes 
 
 ---
 
+##### `samlConfigurationStatus`<sup>Optional</sup> <a name="samlConfigurationStatus" id="@robhan-cdk-lib/aws_grafana.Workspace.property.samlConfigurationStatus"></a>
+
+```typescript
+public readonly samlConfigurationStatus: string;
+```
+
+- *Type:* string
+
+Specifies whether the workspace's SAML configuration is complete.
+
+This is a deploy-time CloudFormation attribute resolved as an unresolved token at synth time,
+so it is typed as `string`. See the `SamlConfigurationStatuses` enum for the possible values.
+
+---
+
+##### `ssoClientId`<sup>Optional</sup> <a name="ssoClientId" id="@robhan-cdk-lib/aws_grafana.Workspace.property.ssoClientId"></a>
+
+```typescript
+public readonly ssoClientId: string;
+```
+
+- *Type:* string
+
+The ID of the IAM Identity Center-managed application that is created by Amazon Managed Grafana.
+
+---
+
 ##### `stackSetName`<sup>Optional</sup> <a name="stackSetName" id="@robhan-cdk-lib/aws_grafana.Workspace.property.stackSetName"></a>
 
 ```typescript
@@ -520,6 +664,21 @@ The name of the AWS CloudFormation stack set that is used to generate IAM roles 
 
 ---
 
+##### `status`<sup>Optional</sup> <a name="status" id="@robhan-cdk-lib/aws_grafana.Workspace.property.status"></a>
+
+```typescript
+public readonly status: string;
+```
+
+- *Type:* string
+
+The current status of the workspace.
+
+This is a deploy-time CloudFormation attribute resolved as an unresolved token at synth time,
+so it is typed as `string`. See the `Status` enum for the possible values.
+
+---
+
 ##### `vpcConfiguration`<sup>Optional</sup> <a name="vpcConfiguration" id="@robhan-cdk-lib/aws_grafana.Workspace.property.vpcConfiguration"></a>
 
 ```typescript
@@ -529,90 +688,6 @@ public readonly vpcConfiguration: VpcConfiguration;
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.VpcConfiguration">VpcConfiguration</a>
 
 The configuration settings for an Amazon VPC that contains data sources for your Grafana workspace to connect to.
-
----
-
-##### `creationTimestamp`<sup>Required</sup> <a name="creationTimestamp" id="@robhan-cdk-lib/aws_grafana.Workspace.property.creationTimestamp"></a>
-
-```typescript
-public readonly creationTimestamp: string;
-```
-
-- *Type:* string
-
-The date that the workspace was created.
-
----
-
-##### `endpoint`<sup>Required</sup> <a name="endpoint" id="@robhan-cdk-lib/aws_grafana.Workspace.property.endpoint"></a>
-
-```typescript
-public readonly endpoint: string;
-```
-
-- *Type:* string
-
-The URL that users can use to access the Grafana console in the workspace.
-
----
-
-##### `grafanaVersion`<sup>Required</sup> <a name="grafanaVersion" id="@robhan-cdk-lib/aws_grafana.Workspace.property.grafanaVersion"></a>
-
-```typescript
-public readonly grafanaVersion: string;
-```
-
-- *Type:* string
-
-Specifies the version of Grafana supported by this workspace.
-
----
-
-##### `modificationTimestamp`<sup>Required</sup> <a name="modificationTimestamp" id="@robhan-cdk-lib/aws_grafana.Workspace.property.modificationTimestamp"></a>
-
-```typescript
-public readonly modificationTimestamp: string;
-```
-
-- *Type:* string
-
-The most recent date that the workspace was modified.
-
----
-
-##### `samlConfigurationStatus`<sup>Required</sup> <a name="samlConfigurationStatus" id="@robhan-cdk-lib/aws_grafana.Workspace.property.samlConfigurationStatus"></a>
-
-```typescript
-public readonly samlConfigurationStatus: SamlConfigurationStatuses;
-```
-
-- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.SamlConfigurationStatuses">SamlConfigurationStatuses</a>
-
-Specifies whether the workspace's SAML configuration is complete.
-
----
-
-##### `ssoClientId`<sup>Required</sup> <a name="ssoClientId" id="@robhan-cdk-lib/aws_grafana.Workspace.property.ssoClientId"></a>
-
-```typescript
-public readonly ssoClientId: string;
-```
-
-- *Type:* string
-
-The ID of the IAM Identity Center-managed application that is created by Amazon Managed Grafana.
-
----
-
-##### `status`<sup>Required</sup> <a name="status" id="@robhan-cdk-lib/aws_grafana.Workspace.property.status"></a>
-
-```typescript
-public readonly status: Status;
-```
-
-- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.Status">Status</a>
-
-The current status of the workspace.
 
 ---
 
@@ -661,6 +736,7 @@ new WorkspaceBase(scope: Construct, id: string, props?: ResourceProps)
 | --- | --- |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.toString">toString</a></code> | Returns a string representation of this construct. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.applyCrossStackReferenceStrength">applyCrossStackReferenceStrength</a></code> | Override the cross-stack reference strength for this resource. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.applyRemovalPolicy">applyRemovalPolicy</a></code> | Apply the given removal policy to this resource. |
 
 ---
@@ -689,6 +765,28 @@ constructs.
 ###### `mixins`<sup>Required</sup> <a name="mixins" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.with.parameter.mixins"></a>
 
 - *Type:* ...constructs.IMixin[]
+
+---
+
+##### `applyCrossStackReferenceStrength` <a name="applyCrossStackReferenceStrength" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.applyCrossStackReferenceStrength"></a>
+
+```typescript
+public applyCrossStackReferenceStrength(strength: ReferenceStrength): void
+```
+
+Override the cross-stack reference strength for this resource.
+
+When set, any cross-stack reference to this resource will use the specified
+mechanism instead of the global default determined by the
+`@aws-cdk/core:defaultCrossStackReferences` context key. This is useful for
+selectively weakening specific references to avoid the "deadly embrace" problem
+without changing the app-wide default.
+
+###### `strength`<sup>Required</sup> <a name="strength" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.applyCrossStackReferenceStrength.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use for this resource.
 
 ---
 
@@ -795,23 +893,30 @@ Check whether the given construct is a Resource.
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this resource belongs to. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.stack">stack</a></code> | <code>aws-cdk-lib.Stack</code> | The stack in which this resource is defined. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.accountAccessType">accountAccessType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a></code> | The account access type for the workspace. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.authenticationProviders">authenticationProviders</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]</code> | The authentication providers for the workspace. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.permissionType">permissionType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes">PermissionTypes</a></code> | The permission type for the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.workspaceArn">workspaceArn</a></code> | <code>string</code> | The ARN of this workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.workspaceId">workspaceId</a></code> | <code>string</code> | The unique ID of this workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.accountAccessType">accountAccessType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a></code> | The account access type for the workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.authenticationProviders">authenticationProviders</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]</code> | The authentication providers for the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.clientToken">clientToken</a></code> | <code>string</code> | The client token for the workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.creationTimestamp">creationTimestamp</a></code> | <code>string</code> | The date that the workspace was created. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.dataSources">dataSources</a></code> | <code>string[]</code> | The data sources of this workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.description">description</a></code> | <code>string</code> | The description of this workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.endpoint">endpoint</a></code> | <code>string</code> | The URL that users can use to access the Grafana console in the workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.grafanaVersion">grafanaVersion</a></code> | <code>string</code> | Specifies the version of Grafana supported by this workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.modificationTimestamp">modificationTimestamp</a></code> | <code>string</code> | The most recent date that the workspace was modified. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.name">name</a></code> | <code>string</code> | The name of this workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.networkAccessControl">networkAccessControl</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.NetworkAccessControl">NetworkAccessControl</a></code> | The configuration settings for network access to your workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.notificationDestinations">notificationDestinations</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.NotificationDestinations">NotificationDestinations</a>[]</code> | The notification destinations for the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.organizationalUnits">organizationalUnits</a></code> | <code>string[]</code> | Specifies the organizational units that this workspace is allowed to use data sources from, if this workspace is in an account that is part of an organization. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.organizationRoleName">organizationRoleName</a></code> | <code>string</code> | The name of the IAM role that is used to access resources through Organizations. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.permissionType">permissionType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes">PermissionTypes</a></code> | The permission type for the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.pluginAdminEnabled">pluginAdminEnabled</a></code> | <code>boolean</code> | Whether plugin administration is enabled in the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.role">role</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | The IAM role that grants permissions to the AWS resources that the workspace will view data from. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.samlConfiguration">samlConfiguration</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration">SamlConfiguration</a></code> | If the workspace uses SAML, use this structure to map SAML assertion attributes to workspace user information and define which groups in the assertion attribute are to have the Admin and Editor roles in the workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.samlConfigurationStatus">samlConfigurationStatus</a></code> | <code>string</code> | Specifies whether the workspace's SAML configuration is complete. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.ssoClientId">ssoClientId</a></code> | <code>string</code> | The ID of the IAM Identity Center-managed application that is created by Amazon Managed Grafana. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.stackSetName">stackSetName</a></code> | <code>string</code> | The name of the AWS CloudFormation stack set that is used to generate IAM roles to be used for this workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.status">status</a></code> | <code>string</code> | The current status of the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.vpcConfiguration">vpcConfiguration</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.VpcConfiguration">VpcConfiguration</a></code> | The configuration settings for an Amazon VPC that contains data sources for your Grafana workspace to connect to. |
 
 ---
@@ -860,42 +965,6 @@ The stack in which this resource is defined.
 
 ---
 
-##### `accountAccessType`<sup>Required</sup> <a name="accountAccessType" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.accountAccessType"></a>
-
-```typescript
-public readonly accountAccessType: AccountAccessType;
-```
-
-- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a>
-
-The account access type for the workspace.
-
----
-
-##### `authenticationProviders`<sup>Required</sup> <a name="authenticationProviders" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.authenticationProviders"></a>
-
-```typescript
-public readonly authenticationProviders: AuthenticationProviders[];
-```
-
-- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]
-
-The authentication providers for the workspace.
-
----
-
-##### `permissionType`<sup>Required</sup> <a name="permissionType" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.permissionType"></a>
-
-```typescript
-public readonly permissionType: PermissionTypes;
-```
-
-- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes">PermissionTypes</a>
-
-The permission type for the workspace.
-
----
-
 ##### `workspaceArn`<sup>Required</sup> <a name="workspaceArn" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.workspaceArn"></a>
 
 ```typescript
@@ -920,6 +989,32 @@ The unique ID of this workspace.
 
 ---
 
+##### `accountAccessType`<sup>Optional</sup> <a name="accountAccessType" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.accountAccessType"></a>
+
+```typescript
+public readonly accountAccessType: AccountAccessType;
+```
+
+- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a>
+- *Default:* not available on workspaces imported from an ARN via `Workspace.fromWorkspaceArn`
+
+The account access type for the workspace.
+
+---
+
+##### `authenticationProviders`<sup>Optional</sup> <a name="authenticationProviders" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.authenticationProviders"></a>
+
+```typescript
+public readonly authenticationProviders: AuthenticationProviders[];
+```
+
+- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]
+- *Default:* not available on workspaces imported from an ARN via `Workspace.fromWorkspaceArn`
+
+The authentication providers for the workspace.
+
+---
+
 ##### `clientToken`<sup>Optional</sup> <a name="clientToken" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.clientToken"></a>
 
 ```typescript
@@ -927,8 +1022,22 @@ public readonly clientToken: string;
 ```
 
 - *Type:* string
+- *Default:* not available on imported workspaces
 
 The client token for the workspace.
+
+---
+
+##### `creationTimestamp`<sup>Optional</sup> <a name="creationTimestamp" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.creationTimestamp"></a>
+
+```typescript
+public readonly creationTimestamp: string;
+```
+
+- *Type:* string
+- *Default:* not available on imported workspaces
+
+The date that the workspace was created.
 
 ---
 
@@ -939,6 +1048,7 @@ public readonly dataSources: string[];
 ```
 
 - *Type:* string[]
+- *Default:* no data sources
 
 The data sources of this workspace.
 
@@ -951,8 +1061,48 @@ public readonly description: string;
 ```
 
 - *Type:* string
+- *Default:* no description
 
 The description of this workspace.
+
+---
+
+##### `endpoint`<sup>Optional</sup> <a name="endpoint" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.endpoint"></a>
+
+```typescript
+public readonly endpoint: string;
+```
+
+- *Type:* string
+- *Default:* not available on imported workspaces
+
+The URL that users can use to access the Grafana console in the workspace.
+
+---
+
+##### `grafanaVersion`<sup>Optional</sup> <a name="grafanaVersion" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.grafanaVersion"></a>
+
+```typescript
+public readonly grafanaVersion: string;
+```
+
+- *Type:* string
+- *Default:* not available on imported workspaces
+
+Specifies the version of Grafana supported by this workspace.
+
+---
+
+##### `modificationTimestamp`<sup>Optional</sup> <a name="modificationTimestamp" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.modificationTimestamp"></a>
+
+```typescript
+public readonly modificationTimestamp: string;
+```
+
+- *Type:* string
+- *Default:* not available on imported workspaces
+
+The most recent date that the workspace was modified.
 
 ---
 
@@ -963,6 +1113,7 @@ public readonly name: string;
 ```
 
 - *Type:* string
+- *Default:* a name is generated by CloudFormation
 
 The name of this workspace.
 
@@ -975,6 +1126,7 @@ public readonly networkAccessControl: NetworkAccessControl;
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.NetworkAccessControl">NetworkAccessControl</a>
+- *Default:* no network access control, the workspace is open to all traffic
 
 The configuration settings for network access to your workspace.
 
@@ -987,6 +1139,7 @@ public readonly notificationDestinations: NotificationDestinations[];
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.NotificationDestinations">NotificationDestinations</a>[]
+- *Default:* no notification destinations
 
 The notification destinations for the workspace.
 
@@ -999,6 +1152,7 @@ public readonly organizationalUnits: string[];
 ```
 
 - *Type:* string[]
+- *Default:* no organizational units
 
 Specifies the organizational units that this workspace is allowed to use data sources from, if this workspace is in an account that is part of an organization.
 
@@ -1011,8 +1165,22 @@ public readonly organizationRoleName: string;
 ```
 
 - *Type:* string
+- *Default:* no organization role name
 
 The name of the IAM role that is used to access resources through Organizations.
+
+---
+
+##### `permissionType`<sup>Optional</sup> <a name="permissionType" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.permissionType"></a>
+
+```typescript
+public readonly permissionType: PermissionTypes;
+```
+
+- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes">PermissionTypes</a>
+- *Default:* not available on workspaces imported from an ARN via `Workspace.fromWorkspaceArn`
+
+The permission type for the workspace.
 
 ---
 
@@ -1023,6 +1191,7 @@ public readonly pluginAdminEnabled: boolean;
 ```
 
 - *Type:* boolean
+- *Default:* false
 
 Whether plugin administration is enabled in the workspace.
 
@@ -1040,6 +1209,7 @@ public readonly role: IRole;
 ```
 
 - *Type:* aws-cdk-lib.aws_iam.IRole
+- *Default:* no role is attached
 
 The IAM role that grants permissions to the AWS resources that the workspace will view data from.
 
@@ -1052,8 +1222,35 @@ public readonly samlConfiguration: SamlConfiguration;
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration">SamlConfiguration</a>
+- *Default:* no SAML configuration
 
 If the workspace uses SAML, use this structure to map SAML assertion attributes to workspace user information and define which groups in the assertion attribute are to have the Admin and Editor roles in the workspace.
+
+---
+
+##### `samlConfigurationStatus`<sup>Optional</sup> <a name="samlConfigurationStatus" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.samlConfigurationStatus"></a>
+
+```typescript
+public readonly samlConfigurationStatus: string;
+```
+
+- *Type:* string
+- *Default:* not available on imported workspaces
+
+Specifies whether the workspace's SAML configuration is complete.
+
+---
+
+##### `ssoClientId`<sup>Optional</sup> <a name="ssoClientId" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.ssoClientId"></a>
+
+```typescript
+public readonly ssoClientId: string;
+```
+
+- *Type:* string
+- *Default:* not available on imported workspaces
+
+The ID of the IAM Identity Center-managed application that is created by Amazon Managed Grafana.
 
 ---
 
@@ -1064,8 +1261,22 @@ public readonly stackSetName: string;
 ```
 
 - *Type:* string
+- *Default:* no stack set name
 
 The name of the AWS CloudFormation stack set that is used to generate IAM roles to be used for this workspace.
+
+---
+
+##### `status`<sup>Optional</sup> <a name="status" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.property.status"></a>
+
+```typescript
+public readonly status: string;
+```
+
+- *Type:* string
+- *Default:* not available on imported workspaces
+
+The current status of the workspace.
 
 ---
 
@@ -1076,6 +1287,7 @@ public readonly vpcConfiguration: VpcConfiguration;
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.VpcConfiguration">VpcConfiguration</a>
+- *Default:* no VPC connection
 
 The configuration settings for an Amazon VPC that contains data sources for your Grafana workspace to connect to.
 
@@ -1112,6 +1324,7 @@ public readonly prefixLists: IPrefixList[];
 ```
 
 - *Type:* aws-cdk-lib.aws_ec2.IPrefixList[]
+- *Default:* no prefix lists; combined with an empty `vpcEndpoints`, all traffic is denied
 
 An array of prefix list IDs.
 
@@ -1120,7 +1333,7 @@ addresses specified are allowed to access your workspace. If the list is not inc
 configuration (passed an empty array) then no IP addresses are allowed to access the
 workspace.
 
-Maximum of 5 prefix lists allowed.
+A maximum of 5 prefix lists is allowed (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1131,6 +1344,7 @@ public readonly vpcEndpoints: IVpcEndpoint[];
 ```
 
 - *Type:* aws-cdk-lib.aws_ec2.IVpcEndpoint[]
+- *Default:* no VPC endpoints; combined with an empty `prefixLists`, all traffic is denied
 
 An array of Amazon VPC endpoint IDs for the workspace.
 
@@ -1139,7 +1353,7 @@ Amazon Managed Grafana workspace for access from within a VPC. If a NetworkAcces
 is specified then only VPC endpoints specified here are allowed to access the workspace. If
 you pass in an empty array of strings, then no VPCs are allowed to access the workspace.
 
-Maximum of 5 VPC endpoints allowed.
+A maximum of 5 VPC endpoints is allowed (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1177,10 +1391,11 @@ public readonly email: string;
 ```
 
 - *Type:* string
+- *Default:* no email attribute mapping
 
 The name of the attribute within the SAML assertion to use as the email names for SAML users.
 
-Must be between 1 and 256 characters long.
+Must be between 1 and 256 characters long (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1191,10 +1406,11 @@ public readonly groups: string;
 ```
 
 - *Type:* string
+- *Default:* no groups attribute mapping
 
 The name of the attribute within the SAML assertion to use as the user full "friendly" names for user groups.
 
-Must be between 1 and 256 characters long.
+Must be between 1 and 256 characters long (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1205,10 +1421,11 @@ public readonly login: string;
 ```
 
 - *Type:* string
+- *Default:* no login attribute mapping
 
 The name of the attribute within the SAML assertion to use as the login names for SAML users.
 
-Must be between 1 and 256 characters long.
+Must be between 1 and 256 characters long (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1219,10 +1436,11 @@ public readonly name: string;
 ```
 
 - *Type:* string
+- *Default:* no name attribute mapping
 
 The name of the attribute within the SAML assertion to use as the user full "friendly" names for SAML users.
 
-Must be between 1 and 256 characters long.
+Must be between 1 and 256 characters long (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1233,10 +1451,11 @@ public readonly org: string;
 ```
 
 - *Type:* string
+- *Default:* no org attribute mapping
 
 The name of the attribute within the SAML assertion to use as the user full "friendly" names for the users' organizations.
 
-Must be between 1 and 256 characters long.
+Must be between 1 and 256 characters long (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1247,10 +1466,11 @@ public readonly role: string;
 ```
 
 - *Type:* string
+- *Default:* no role attribute mapping
 
 The name of the attribute within the SAML assertion to use as the user roles.
 
-Must be between 1 and 256 characters long.
+Must be between 1 and 256 characters long (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1272,7 +1492,7 @@ const samlConfiguration: SamlConfiguration = { ... }
 | --- | --- | --- |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration.property.idpMetadata">idpMetadata</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.SamlIdpMetadata">SamlIdpMetadata</a></code> | A structure containing the identity provider (IdP) metadata used to integrate the identity provider with this workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration.property.allowedOrganizations">allowedOrganizations</a></code> | <code>string[]</code> | Lists which organizations defined in the SAML assertion are allowed to use the Amazon Managed Grafana workspace. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration.property.assertionAtrributes">assertionAtrributes</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes">SamlAssertionAttributes</a></code> | A structure that defines which attributes in the SAML assertion are to be used to define information about the users authenticated by that IdP to use the workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration.property.assertionAttributes">assertionAttributes</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes">SamlAssertionAttributes</a></code> | A structure that defines which attributes in the SAML assertion are to be used to define information about the users authenticated by that IdP to use the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration.property.loginValidityDuration">loginValidityDuration</a></code> | <code>number</code> | How long a sign-on session by a SAML user is valid, before the user has to sign on again. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration.property.roleValues">roleValues</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.SamlRoleValues">SamlRoleValues</a></code> | A structure containing arrays that map group names in the SAML assertion to the Grafana Admin and Editor roles in the workspace. |
 
@@ -1299,22 +1519,24 @@ public readonly allowedOrganizations: string[];
 ```
 
 - *Type:* string[]
+- *Default:* all organizations in the assertion attribute have access
 
 Lists which organizations defined in the SAML assertion are allowed to use the Amazon Managed Grafana workspace.
 
 If this is empty, all organizations in the assertion attribute have access.
 
-Must have between 1 and 256 elements.
+Must have between 1 and 256 elements (validated by CloudFormation at deploy time).
 
 ---
 
-##### `assertionAtrributes`<sup>Optional</sup> <a name="assertionAtrributes" id="@robhan-cdk-lib/aws_grafana.SamlConfiguration.property.assertionAtrributes"></a>
+##### `assertionAttributes`<sup>Optional</sup> <a name="assertionAttributes" id="@robhan-cdk-lib/aws_grafana.SamlConfiguration.property.assertionAttributes"></a>
 
 ```typescript
-public readonly assertionAtrributes: SamlAssertionAttributes;
+public readonly assertionAttributes: SamlAssertionAttributes;
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.SamlAssertionAttributes">SamlAssertionAttributes</a>
+- *Default:* no assertion attribute mapping
 
 A structure that defines which attributes in the SAML assertion are to be used to define information about the users authenticated by that IdP to use the workspace.
 
@@ -1327,10 +1549,11 @@ public readonly loginValidityDuration: number;
 ```
 
 - *Type:* number
+- *Default:* the service default session validity applies
 
 How long a sign-on session by a SAML user is valid, before the user has to sign on again.
 
-Must be a positive number.
+Must be a positive number (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1341,6 +1564,7 @@ public readonly roleValues: SamlRoleValues;
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.SamlRoleValues">SamlRoleValues</a>
+- *Default:* no role mapping
 
 A structure containing arrays that map group names in the SAML assertion to the Grafana Admin and Editor roles in the workspace.
 
@@ -1374,10 +1598,12 @@ public readonly url: string;
 ```
 
 - *Type:* string
+- *Default:* no metadata URL; supply `xml` instead
 
 The URL of the location containing the IdP metadata.
 
-Must be a string with length between 1 and 2048 characters.
+Must be a string with length between 1 and 2048 characters (validated by CloudFormation at
+deploy time).
 
 ---
 
@@ -1388,6 +1614,7 @@ public readonly xml: string;
 ```
 
 - *Type:* string
+- *Default:* no inline metadata; supply `url` instead
 
 The full IdP metadata, in XML format.
 
@@ -1421,10 +1648,11 @@ public readonly admin: string[];
 ```
 
 - *Type:* string[]
+- *Default:* no groups are granted the Admin role
 
 A list of groups from the SAML assertion attribute to grant the Grafana Admin role to.
 
-Maximum of 256 elements.
+A maximum of 256 elements is allowed (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1435,10 +1663,11 @@ public readonly editor: string[];
 ```
 
 - *Type:* string[]
+- *Default:* no groups are granted the Editor role
 
 A list of groups from the SAML assertion attribute to grant the Grafana Editor role to.
 
-Maximum of 256 elements.
+A maximum of 256 elements is allowed (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1475,7 +1704,8 @@ The list of Amazon EC2 security groups attached to the Amazon VPC for your Grafa
 
 Duplicates not allowed.
 
-Array Members: Minimum number of 1 items. Maximum number of 5 items.
+Array members: minimum of 1 item, maximum of 5 items (validated by CloudFormation at deploy
+time).
 
 Required for VPC configuration.
 
@@ -1491,7 +1721,8 @@ public readonly subnets: ISubnet[];
 
 The list of Amazon EC2 subnets created in the Amazon VPC for your Grafana workspace to connect. Duplicates not allowed.
 
-Array Members: Minimum number of 2 items. Maximum number of 6 items.
+Array members: minimum of 2 items, maximum of 6 items (validated by CloudFormation at deploy
+time).
 
 Required for VPC configuration.
 
@@ -1602,10 +1833,13 @@ public readonly clientToken: string;
 ```
 
 - *Type:* string
+- *Default:* no client token
 
 A unique, case-sensitive, user-provided identifier to ensure the idempotency of the request.
 
-Must be 1-64 characters long and contain only printable ASCII characters.
+Must be 1-64 characters long and contain only printable ASCII characters (validated by
+CloudFormation at deploy time). Note that an idempotency token has no practical effect in the
+declarative CloudFormation/CDK deployment model.
 
 ---
 
@@ -1616,11 +1850,13 @@ public readonly dataSources: string[];
 ```
 
 - *Type:* string[]
+- *Default:* no data sources
 
 Specifies the AWS data sources that have been configured to have IAM roles and permissions created to allow Amazon Managed Grafana to read data from these sources.
 
 This list is only used when the workspace was created through the AWS console, and the
-permissionType is SERVICE_MANAGED.
+permissionType is SERVICE_MANAGED. The Amazon Managed Grafana API marks this parameter as for
+internal use only and recommends against setting it.
 
 ---
 
@@ -1631,10 +1867,11 @@ public readonly description: string;
 ```
 
 - *Type:* string
+- *Default:* no description
 
 The user-defined description of the workspace.
 
-Maximum length of 2048 characters.
+Maximum length of 2048 characters (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1645,11 +1882,12 @@ public readonly name: string;
 ```
 
 - *Type:* string
+- *Default:* a name is generated by CloudFormation
 
 The name of the workspace.
 
 Must be 1-255 characters long and contain only alphanumeric characters, hyphens, dots,
-underscores, and tildes.
+underscores, and tildes (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1660,6 +1898,7 @@ public readonly networkAccessControl: NetworkAccessControl;
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.NetworkAccessControl">NetworkAccessControl</a>
+- *Default:* no network access control, the workspace is open to all traffic
 
 The configuration settings for network access to your workspace.
 
@@ -1672,6 +1911,7 @@ public readonly notificationDestinations: NotificationDestinations[];
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.NotificationDestinations">NotificationDestinations</a>[]
+- *Default:* no notification destinations
 
 The AWS notification channels that Amazon Managed Grafana can automatically create IAM roles and permissions for, to allow Amazon Managed Grafana to use these channels.
 
@@ -1684,6 +1924,7 @@ public readonly organizationalUnits: string[];
 ```
 
 - *Type:* string[]
+- *Default:* no organizational units
 
 Specifies the organizational units that this workspace is allowed to use data sources from, if this workspace is in an account that is part of an organization.
 
@@ -1696,10 +1937,11 @@ public readonly organizationRoleName: string;
 ```
 
 - *Type:* string
+- *Default:* no organization role name
 
 Name of the IAM role to use for the organization.
 
-Maximum length of 2048 characters.
+Maximum length of 2048 characters (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1710,6 +1952,7 @@ public readonly pluginAdminEnabled: boolean;
 ```
 
 - *Type:* boolean
+- *Default:* false
 
 Whether plugin administration is enabled in the workspace.
 
@@ -1717,8 +1960,6 @@ Setting to true allows workspace
 admins to install, uninstall, and update plugins from within the Grafana workspace.
 
 This option is only valid for workspaces that support Grafana version 9 or newer.
-
-Default: false
 
 ---
 
@@ -1729,6 +1970,7 @@ public readonly role: IRole;
 ```
 
 - *Type:* aws-cdk-lib.aws_iam.IRole
+- *Default:* no role is attached
 
 The IAM role that grants permissions to the AWS resources that the workspace will view data from.
 
@@ -1741,6 +1983,7 @@ public readonly samlConfiguration: SamlConfiguration;
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration">SamlConfiguration</a>
+- *Default:* no SAML configuration
 
 If the workspace uses SAML, use this structure to map SAML assertion attributes to workspace user information and define which groups in the assertion attribute are to have the Admin and Editor roles in the workspace.
 
@@ -1753,6 +1996,7 @@ public readonly stackSetName: string;
 ```
 
 - *Type:* string
+- *Default:* no stack set name
 
 The name of the AWS CloudFormation stack set that is used to generate IAM roles to be used for this workspace.
 
@@ -1765,6 +2009,7 @@ public readonly vpcConfiguration: VpcConfiguration;
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.VpcConfiguration">VpcConfiguration</a>
+- *Default:* no VPC connection
 
 The configuration settings for an Amazon VPC that contains data sources for your Grafana workspace to connect to.
 
@@ -1802,6 +2047,7 @@ const workspaceProps: WorkspaceProps = { ... }
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceProps.property.role">role</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | The IAM role that grants permissions to the AWS resources that the workspace will view data from. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceProps.property.samlConfiguration">samlConfiguration</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration">SamlConfiguration</a></code> | If the workspace uses SAML, use this structure to map SAML assertion attributes to workspace user information and define which groups in the assertion attribute are to have the Admin and Editor roles in the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceProps.property.stackSetName">stackSetName</a></code> | <code>string</code> | The name of the AWS CloudFormation stack set that is used to generate IAM roles to be used for this workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceProps.property.tags">tags</a></code> | <code>{[ key: string ]: string}</code> | A map of tags to assign to the workspace. Tags can also be applied after creation using `Tags.of(workspace).add(key, value)`. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.WorkspaceProps.property.vpcConfiguration">vpcConfiguration</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.VpcConfiguration">VpcConfiguration</a></code> | The configuration settings for an Amazon VPC that contains data sources for your Grafana workspace to connect to. |
 
 ---
@@ -1865,10 +2111,13 @@ public readonly clientToken: string;
 ```
 
 - *Type:* string
+- *Default:* no client token
 
 A unique, case-sensitive, user-provided identifier to ensure the idempotency of the request.
 
-Must be 1-64 characters long and contain only printable ASCII characters.
+Must be 1-64 characters long and contain only printable ASCII characters (validated by
+CloudFormation at deploy time). Note that an idempotency token has no practical effect in the
+declarative CloudFormation/CDK deployment model.
 
 ---
 
@@ -1879,11 +2128,13 @@ public readonly dataSources: string[];
 ```
 
 - *Type:* string[]
+- *Default:* no data sources
 
 Specifies the AWS data sources that have been configured to have IAM roles and permissions created to allow Amazon Managed Grafana to read data from these sources.
 
 This list is only used when the workspace was created through the AWS console, and the
-permissionType is SERVICE_MANAGED.
+permissionType is SERVICE_MANAGED. The Amazon Managed Grafana API marks this parameter as for
+internal use only and recommends against setting it.
 
 ---
 
@@ -1894,10 +2145,11 @@ public readonly description: string;
 ```
 
 - *Type:* string
+- *Default:* no description
 
 The user-defined description of the workspace.
 
-Maximum length of 2048 characters.
+Maximum length of 2048 characters (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1908,15 +2160,16 @@ public readonly grafanaVersion: string;
 ```
 
 - *Type:* string
+- *Default:* the service assigns the latest Grafana version
 
 Specifies the version of Grafana to support in the workspace.
 
 Defaults to the latest version
-on create (for example, 9.4), or the current version of the workspace on update.
+on create (for example, 10.4), or the current version of the workspace on update.
 Can only be used to upgrade (for example, from 8.4 to 9.4), not downgrade (for example, from
 9.4 to 8.4).
 
-Must be 1-255 characters long.
+Must be 1-255 characters long (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1927,11 +2180,12 @@ public readonly name: string;
 ```
 
 - *Type:* string
+- *Default:* a name is generated by CloudFormation
 
 The name of the workspace.
 
 Must be 1-255 characters long and contain only alphanumeric characters, hyphens, dots,
-underscores, and tildes.
+underscores, and tildes (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1942,6 +2196,7 @@ public readonly networkAccessControl: NetworkAccessControl;
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.NetworkAccessControl">NetworkAccessControl</a>
+- *Default:* no network access control, the workspace is open to all traffic
 
 The configuration settings for network access to your workspace.
 
@@ -1954,6 +2209,7 @@ public readonly notificationDestinations: NotificationDestinations[];
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.NotificationDestinations">NotificationDestinations</a>[]
+- *Default:* no notification destinations
 
 The AWS notification channels that Amazon Managed Grafana can automatically create IAM roles and permissions for, to allow Amazon Managed Grafana to use these channels.
 
@@ -1966,6 +2222,7 @@ public readonly organizationalUnits: string[];
 ```
 
 - *Type:* string[]
+- *Default:* no organizational units
 
 Specifies the organizational units that this workspace is allowed to use data sources from, if this workspace is in an account that is part of an organization.
 
@@ -1978,10 +2235,11 @@ public readonly organizationRoleName: string;
 ```
 
 - *Type:* string
+- *Default:* no organization role name
 
 Name of the IAM role to use for the organization.
 
-Maximum length of 2048 characters.
+Maximum length of 2048 characters (validated by CloudFormation at deploy time).
 
 ---
 
@@ -1992,6 +2250,7 @@ public readonly pluginAdminEnabled: boolean;
 ```
 
 - *Type:* boolean
+- *Default:* false
 
 Whether plugin administration is enabled in the workspace.
 
@@ -1999,8 +2258,6 @@ Setting to true allows workspace
 admins to install, uninstall, and update plugins from within the Grafana workspace.
 
 This option is only valid for workspaces that support Grafana version 9 or newer.
-
-Default: false
 
 ---
 
@@ -2011,6 +2268,7 @@ public readonly role: IRole;
 ```
 
 - *Type:* aws-cdk-lib.aws_iam.IRole
+- *Default:* no role is attached
 
 The IAM role that grants permissions to the AWS resources that the workspace will view data from.
 
@@ -2023,6 +2281,7 @@ public readonly samlConfiguration: SamlConfiguration;
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration">SamlConfiguration</a>
+- *Default:* no SAML configuration
 
 If the workspace uses SAML, use this structure to map SAML assertion attributes to workspace user information and define which groups in the assertion attribute are to have the Admin and Editor roles in the workspace.
 
@@ -2035,8 +2294,26 @@ public readonly stackSetName: string;
 ```
 
 - *Type:* string
+- *Default:* no stack set name
 
 The name of the AWS CloudFormation stack set that is used to generate IAM roles to be used for this workspace.
+
+---
+
+##### `tags`<sup>Optional</sup> <a name="tags" id="@robhan-cdk-lib/aws_grafana.WorkspaceProps.property.tags"></a>
+
+```typescript
+public readonly tags: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* no tags
+
+A map of tags to assign to the workspace. Tags can also be applied after creation using `Tags.of(workspace).add(key, value)`.
+
+Constraints (from the Amazon Managed Grafana API): a maximum of 50 tags, each key must be
+1-128 characters long and each value 0-256 characters long (validated by CloudFormation at
+deploy time).
 
 ---
 
@@ -2047,6 +2324,7 @@ public readonly vpcConfiguration: VpcConfiguration;
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.VpcConfiguration">VpcConfiguration</a>
+- *Default:* no VPC connection
 
 The configuration settings for an Amazon VPC that contains data sources for your Grafana workspace to connect to.
 
@@ -2071,23 +2349,30 @@ Represents an Amazon Managed Service for Grafana workspace.
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this resource belongs to. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.stack">stack</a></code> | <code>aws-cdk-lib.Stack</code> | The stack in which this resource is defined. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.accountAccessType">accountAccessType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a></code> | Specifies whether the workspace can access AWS resources in this AWS account only, or whether it can also access AWS resources in other accounts in the same organization. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.authenticationProviders">authenticationProviders</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]</code> | Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to authenticate users for using the Grafana console within a workspace. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.permissionType">permissionType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes">PermissionTypes</a></code> | If this is SERVICE_MANAGED, and the workplace was created through the Amazon Managed Grafana console, then Amazon Managed Grafana automatically creates the IAM roles and provisions the permissions that the workspace needs to use AWS data sources and notification channels. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.workspaceArn">workspaceArn</a></code> | <code>string</code> | The ARN of this workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.workspaceId">workspaceId</a></code> | <code>string</code> | The unique ID of this workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.accountAccessType">accountAccessType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a></code> | Specifies whether the workspace can access AWS resources in this AWS account only, or whether it can also access AWS resources in other accounts in the same organization. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.authenticationProviders">authenticationProviders</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]</code> | Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to authenticate users for using the Grafana console within a workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.clientToken">clientToken</a></code> | <code>string</code> | A unique, case-sensitive, user-provided identifier to ensure the idempotency of the request. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.creationTimestamp">creationTimestamp</a></code> | <code>string</code> | The date that the workspace was created. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.dataSources">dataSources</a></code> | <code>string[]</code> | Specifies the AWS data sources that have been configured to have IAM roles and permissions created to allow Amazon Managed Grafana to read data from these sources. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.description">description</a></code> | <code>string</code> | The user-defined description of the workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.endpoint">endpoint</a></code> | <code>string</code> | The URL that users can use to access the Grafana console in the workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.grafanaVersion">grafanaVersion</a></code> | <code>string</code> | Specifies the version of Grafana supported by this workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.modificationTimestamp">modificationTimestamp</a></code> | <code>string</code> | The most recent date that the workspace was modified. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.name">name</a></code> | <code>string</code> | The name of the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.networkAccessControl">networkAccessControl</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.NetworkAccessControl">NetworkAccessControl</a></code> | The configuration settings for network access to your workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.notificationDestinations">notificationDestinations</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.NotificationDestinations">NotificationDestinations</a>[]</code> | The AWS notification channels that Amazon Managed Grafana can automatically create IAM roles and permissions for, to allow Amazon Managed Grafana to use these channels. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.organizationalUnits">organizationalUnits</a></code> | <code>string[]</code> | Specifies the organizational units that this workspace is allowed to use data sources from, if this workspace is in an account that is part of an organization. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.organizationRoleName">organizationRoleName</a></code> | <code>string</code> | The name of the IAM role that is used to access resources through Organizations. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.permissionType">permissionType</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes">PermissionTypes</a></code> | If this is SERVICE_MANAGED, and the workplace was created through the Amazon Managed Grafana console, then Amazon Managed Grafana automatically creates the IAM roles and provisions the permissions that the workspace needs to use AWS data sources and notification channels. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.pluginAdminEnabled">pluginAdminEnabled</a></code> | <code>boolean</code> | Whether plugin administration is enabled in the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.role">role</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | The IAM role that grants permissions to the AWS resources that the workspace will view data from. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.samlConfiguration">samlConfiguration</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration">SamlConfiguration</a></code> | If the workspace uses SAML, use this structure to map SAML assertion attributes to workspace user information and define which groups in the assertion attribute are to have the Admin and Editor roles in the workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.samlConfigurationStatus">samlConfigurationStatus</a></code> | <code>string</code> | Specifies whether the workspace's SAML configuration is complete. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.ssoClientId">ssoClientId</a></code> | <code>string</code> | The ID of the IAM Identity Center-managed application that is created by Amazon Managed Grafana. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.stackSetName">stackSetName</a></code> | <code>string</code> | The name of the AWS CloudFormation stack set that is used to generate IAM roles to be used for this workspace. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.status">status</a></code> | <code>string</code> | The current status of the workspace. |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.IWorkspace.property.vpcConfiguration">vpcConfiguration</a></code> | <code><a href="#@robhan-cdk-lib/aws_grafana.VpcConfiguration">VpcConfiguration</a></code> | The configuration settings for an Amazon VPC that contains data sources for your Grafana workspace to connect to. |
 
 ---
@@ -2136,52 +2421,6 @@ The stack in which this resource is defined.
 
 ---
 
-##### `accountAccessType`<sup>Required</sup> <a name="accountAccessType" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.accountAccessType"></a>
-
-```typescript
-public readonly accountAccessType: AccountAccessType;
-```
-
-- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a>
-
-Specifies whether the workspace can access AWS resources in this AWS account only, or whether it can also access AWS resources in other accounts in the same organization.
-
-If this is
-ORGANIZATION, the OrganizationalUnits parameter specifies which organizational units the
-workspace can access.
-
----
-
-##### `authenticationProviders`<sup>Required</sup> <a name="authenticationProviders" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.authenticationProviders"></a>
-
-```typescript
-public readonly authenticationProviders: AuthenticationProviders[];
-```
-
-- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]
-
-Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to authenticate users for using the Grafana console within a workspace.
-
----
-
-##### `permissionType`<sup>Required</sup> <a name="permissionType" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.permissionType"></a>
-
-```typescript
-public readonly permissionType: PermissionTypes;
-```
-
-- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes">PermissionTypes</a>
-
-If this is SERVICE_MANAGED, and the workplace was created through the Amazon Managed Grafana console, then Amazon Managed Grafana automatically creates the IAM roles and provisions the permissions that the workspace needs to use AWS data sources and notification channels.
-
-If this is CUSTOMER_MANAGED, you must manage those roles and permissions yourself.
-
-If you are working with a workspace in a member account of an organization and that account is
-not a delegated administrator account, and you want the workspace to access data sources in
-other AWS accounts in the organization, this parameter must be set to CUSTOMER_MANAGED.
-
----
-
 ##### `workspaceArn`<sup>Required</sup> <a name="workspaceArn" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.workspaceArn"></a>
 
 ```typescript
@@ -2206,6 +2445,36 @@ The unique ID of this workspace.
 
 ---
 
+##### `accountAccessType`<sup>Optional</sup> <a name="accountAccessType" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.accountAccessType"></a>
+
+```typescript
+public readonly accountAccessType: AccountAccessType;
+```
+
+- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.AccountAccessType">AccountAccessType</a>
+- *Default:* not available on workspaces imported from an ARN via `Workspace.fromWorkspaceArn`
+
+Specifies whether the workspace can access AWS resources in this AWS account only, or whether it can also access AWS resources in other accounts in the same organization.
+
+If this is
+ORGANIZATION, the OrganizationalUnits parameter specifies which organizational units the
+workspace can access.
+
+---
+
+##### `authenticationProviders`<sup>Optional</sup> <a name="authenticationProviders" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.authenticationProviders"></a>
+
+```typescript
+public readonly authenticationProviders: AuthenticationProviders[];
+```
+
+- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.AuthenticationProviders">AuthenticationProviders</a>[]
+- *Default:* not available on workspaces imported from an ARN via `Workspace.fromWorkspaceArn`
+
+Specifies whether this workspace uses SAML 2.0, AWS IAM Identity Center, or both to authenticate users for using the Grafana console within a workspace.
+
+---
+
 ##### `clientToken`<sup>Optional</sup> <a name="clientToken" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.clientToken"></a>
 
 ```typescript
@@ -2213,8 +2482,22 @@ public readonly clientToken: string;
 ```
 
 - *Type:* string
+- *Default:* not available on imported workspaces
 
 A unique, case-sensitive, user-provided identifier to ensure the idempotency of the request.
+
+---
+
+##### `creationTimestamp`<sup>Optional</sup> <a name="creationTimestamp" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.creationTimestamp"></a>
+
+```typescript
+public readonly creationTimestamp: string;
+```
+
+- *Type:* string
+- *Default:* not available on imported workspaces
+
+The date that the workspace was created.
 
 ---
 
@@ -2225,11 +2508,13 @@ public readonly dataSources: string[];
 ```
 
 - *Type:* string[]
+- *Default:* no data sources
 
 Specifies the AWS data sources that have been configured to have IAM roles and permissions created to allow Amazon Managed Grafana to read data from these sources.
 
 This list is only used when the workspace was created through the AWS console, and the
-permissionType is SERVICE_MANAGED.
+permissionType is SERVICE_MANAGED. The Amazon Managed Grafana API marks this parameter as for
+internal use only and recommends against setting it.
 
 ---
 
@@ -2240,8 +2525,48 @@ public readonly description: string;
 ```
 
 - *Type:* string
+- *Default:* no description
 
 The user-defined description of the workspace.
+
+---
+
+##### `endpoint`<sup>Optional</sup> <a name="endpoint" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.endpoint"></a>
+
+```typescript
+public readonly endpoint: string;
+```
+
+- *Type:* string
+- *Default:* not available on imported workspaces
+
+The URL that users can use to access the Grafana console in the workspace.
+
+---
+
+##### `grafanaVersion`<sup>Optional</sup> <a name="grafanaVersion" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.grafanaVersion"></a>
+
+```typescript
+public readonly grafanaVersion: string;
+```
+
+- *Type:* string
+- *Default:* not available on imported workspaces
+
+Specifies the version of Grafana supported by this workspace.
+
+---
+
+##### `modificationTimestamp`<sup>Optional</sup> <a name="modificationTimestamp" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.modificationTimestamp"></a>
+
+```typescript
+public readonly modificationTimestamp: string;
+```
+
+- *Type:* string
+- *Default:* not available on imported workspaces
+
+The most recent date that the workspace was modified.
 
 ---
 
@@ -2252,6 +2577,7 @@ public readonly name: string;
 ```
 
 - *Type:* string
+- *Default:* a name is generated by CloudFormation
 
 The name of the workspace.
 
@@ -2264,6 +2590,7 @@ public readonly networkAccessControl: NetworkAccessControl;
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.NetworkAccessControl">NetworkAccessControl</a>
+- *Default:* no network access control, the workspace is open to all traffic
 
 The configuration settings for network access to your workspace.
 
@@ -2276,6 +2603,7 @@ public readonly notificationDestinations: NotificationDestinations[];
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.NotificationDestinations">NotificationDestinations</a>[]
+- *Default:* no notification destinations
 
 The AWS notification channels that Amazon Managed Grafana can automatically create IAM roles and permissions for, to allow Amazon Managed Grafana to use these channels.
 
@@ -2288,6 +2616,7 @@ public readonly organizationalUnits: string[];
 ```
 
 - *Type:* string[]
+- *Default:* no organizational units
 
 Specifies the organizational units that this workspace is allowed to use data sources from, if this workspace is in an account that is part of an organization.
 
@@ -2300,8 +2629,28 @@ public readonly organizationRoleName: string;
 ```
 
 - *Type:* string
+- *Default:* no organization role name
 
 The name of the IAM role that is used to access resources through Organizations.
+
+---
+
+##### `permissionType`<sup>Optional</sup> <a name="permissionType" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.permissionType"></a>
+
+```typescript
+public readonly permissionType: PermissionTypes;
+```
+
+- *Type:* <a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes">PermissionTypes</a>
+- *Default:* not available on workspaces imported from an ARN via `Workspace.fromWorkspaceArn`
+
+If this is SERVICE_MANAGED, and the workplace was created through the Amazon Managed Grafana console, then Amazon Managed Grafana automatically creates the IAM roles and provisions the permissions that the workspace needs to use AWS data sources and notification channels.
+
+If this is CUSTOMER_MANAGED, you must manage those roles and permissions yourself.
+
+If you are working with a workspace in a member account of an organization and that account is
+not a delegated administrator account, and you want the workspace to access data sources in
+other AWS accounts in the organization, this parameter must be set to CUSTOMER_MANAGED.
 
 ---
 
@@ -2312,6 +2661,7 @@ public readonly pluginAdminEnabled: boolean;
 ```
 
 - *Type:* boolean
+- *Default:* false
 
 Whether plugin administration is enabled in the workspace.
 
@@ -2329,6 +2679,7 @@ public readonly role: IRole;
 ```
 
 - *Type:* aws-cdk-lib.aws_iam.IRole
+- *Default:* no role is attached
 
 The IAM role that grants permissions to the AWS resources that the workspace will view data from.
 
@@ -2341,8 +2692,35 @@ public readonly samlConfiguration: SamlConfiguration;
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.SamlConfiguration">SamlConfiguration</a>
+- *Default:* no SAML configuration
 
 If the workspace uses SAML, use this structure to map SAML assertion attributes to workspace user information and define which groups in the assertion attribute are to have the Admin and Editor roles in the workspace.
+
+---
+
+##### `samlConfigurationStatus`<sup>Optional</sup> <a name="samlConfigurationStatus" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.samlConfigurationStatus"></a>
+
+```typescript
+public readonly samlConfigurationStatus: string;
+```
+
+- *Type:* string
+- *Default:* not available on imported workspaces
+
+Specifies whether the workspace's SAML configuration is complete.
+
+---
+
+##### `ssoClientId`<sup>Optional</sup> <a name="ssoClientId" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.ssoClientId"></a>
+
+```typescript
+public readonly ssoClientId: string;
+```
+
+- *Type:* string
+- *Default:* not available on imported workspaces
+
+The ID of the IAM Identity Center-managed application that is created by Amazon Managed Grafana.
 
 ---
 
@@ -2353,8 +2731,22 @@ public readonly stackSetName: string;
 ```
 
 - *Type:* string
+- *Default:* no stack set name
 
 The name of the AWS CloudFormation stack set that is used to generate IAM roles to be used for this workspace.
+
+---
+
+##### `status`<sup>Optional</sup> <a name="status" id="@robhan-cdk-lib/aws_grafana.IWorkspace.property.status"></a>
+
+```typescript
+public readonly status: string;
+```
+
+- *Type:* string
+- *Default:* not available on imported workspaces
+
+The current status of the workspace.
 
 ---
 
@@ -2365,6 +2757,7 @@ public readonly vpcConfiguration: VpcConfiguration;
 ```
 
 - *Type:* <a href="#@robhan-cdk-lib/aws_grafana.VpcConfiguration">VpcConfiguration</a>
+- *Default:* no VPC connection
 
 The configuration settings for an Amazon VPC that contains data sources for your Grafana workspace to connect to.
 
@@ -2466,7 +2859,7 @@ other AWS accounts in the organization, this parameter must be set to CUSTOMER_M
 | **Name** | **Description** |
 | --- | --- |
 | <code><a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes.CUSTOMER_MANAGED">CUSTOMER_MANAGED</a></code> | Customer-managed permissions where you manage user access to Grafana. |
-| <code><a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes.SERVICE_MANAGED">SERVICE_MANAGED</a></code> | Service-managed permissions where AWS manages user access to Grafana. |
+| <code><a href="#@robhan-cdk-lib/aws_grafana.PermissionTypes.SERVICE_MANAGED">SERVICE_MANAGED</a></code> | Service-managed permissions, where Amazon Managed Grafana creates and manages the IAM roles. |
 
 ---
 
@@ -2479,7 +2872,11 @@ Customer-managed permissions where you manage user access to Grafana.
 
 ##### `SERVICE_MANAGED` <a name="SERVICE_MANAGED" id="@robhan-cdk-lib/aws_grafana.PermissionTypes.SERVICE_MANAGED"></a>
 
-Service-managed permissions where AWS manages user access to Grafana.
+Service-managed permissions, where Amazon Managed Grafana creates and manages the IAM roles.
+
+Per the Amazon Managed Grafana API, this value is valid only for workspaces created through the
+console; workspaces created via the API, CLI, or CloudFormation (including this construct) must
+use `CUSTOMER_MANAGED`.
 
 ---
 
