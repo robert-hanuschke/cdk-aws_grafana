@@ -6,11 +6,13 @@ In [aws-cdk-lib.aws_grafana](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk
 
 While helpful, they miss convenience like:
 
-- advanced parameter checking (min/max number values, string lengths, array lengths...) before CloudFormation deployment
 - proper parameter typing, e.g. enum values instead of strings
 - simply referencing other constructs instead of e.g. ARN strings
 
 Those features are implemented here.
+
+Parameter constraints (string lengths, allowed patterns, array sizes, etc.)
+are validated by CloudFormation at deploy time.
 
 The CDK maintainers explain that [publishing your own package](https://github.com/aws/aws-cdk/blob/main/CONTRIBUTING.md#publishing-your-own-package) is "by far the strongest signal you can give to the CDK team that a feature should be included within the core aws-cdk packages".
 
