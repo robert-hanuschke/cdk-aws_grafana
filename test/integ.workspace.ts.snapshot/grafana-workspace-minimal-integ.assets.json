@@ -1,0 +1,20 @@
+{
+  "version": "54.0.0",
+  "files": {
+    "38dcc40ea7473ec5b6668c6328c7c75c907281bb332a14499a540071bd4c1033": {
+      "displayName": "grafana-workspace-minimal-integ Template",
+      "source": {
+        "path": "grafana-workspace-minimal-integ.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region-4ffe190f": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "38dcc40ea7473ec5b6668c6328c7c75c907281bb332a14499a540071bd4c1033.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

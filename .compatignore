@@ -1,0 +1,37 @@
+# jsii-diff suppressions (API compatibility). Each entry is an intentional, reviewed break for
+# the next MAJOR version of this package. Consumed by `yarn compat`
+# (`jsii-diff --ignore-file .compatignore`), comparing the published baseline to the local build.
+#
+# --- Deprecated SAML misspelling removed (breaking) ---
+# `SamlConfiguration.assertionAtrributes` was a misspelled alias of `assertionAttributes`, kept
+# temporarily as `@deprecated`. It is removed in this major. Use `assertionAttributes`.
+removed:@robhan-cdk-lib/aws_grafana.SamlConfiguration.assertionAtrributes
+#
+# --- Intentional API relaxation: accountAccessType / authenticationProviders / permissionType ---
+# These read members were made OPTIONAL on IWorkspace / WorkspaceBase / Workspace so that
+# `Workspace.fromWorkspaceArn(...)` returns a legitimately-typed import that does not carry
+# create-time configuration, instead of a `undefined as unknown as T` type-lie. They remain
+# REQUIRED on `WorkspaceProps`, so creating a workspace is unchanged.
+changed-type:@robhan-cdk-lib/aws_grafana.Workspace.accountAccessType
+changed-type:@robhan-cdk-lib/aws_grafana.Workspace.authenticationProviders
+changed-type:@robhan-cdk-lib/aws_grafana.Workspace.permissionType
+changed-type:@robhan-cdk-lib/aws_grafana.WorkspaceBase.accountAccessType
+changed-type:@robhan-cdk-lib/aws_grafana.WorkspaceBase.authenticationProviders
+changed-type:@robhan-cdk-lib/aws_grafana.WorkspaceBase.permissionType
+changed-type:@robhan-cdk-lib/aws_grafana.IWorkspace.accountAccessType
+changed-type:@robhan-cdk-lib/aws_grafana.IWorkspace.authenticationProviders
+changed-type:@robhan-cdk-lib/aws_grafana.IWorkspace.permissionType
+#
+# --- CloudFormation attributes: now optional + string-typed (core parity) ---
+# The read attributes were made OPTIONAL (they are unknowable on an ARN import, and are now
+# declared on the IWorkspace resource interface as `@attribute`), and `status` /
+# `samlConfigurationStatus` were retyped from enum to `string` because they are unresolved
+# CloudFormation tokens at synth time (an enum type on a deploy-time token is misleading). The
+# `Status` / `SamlConfigurationStatuses` enums remain exported to document the possible values.
+changed-type:@robhan-cdk-lib/aws_grafana.Workspace.creationTimestamp
+changed-type:@robhan-cdk-lib/aws_grafana.Workspace.endpoint
+changed-type:@robhan-cdk-lib/aws_grafana.Workspace.grafanaVersion
+changed-type:@robhan-cdk-lib/aws_grafana.Workspace.modificationTimestamp
+changed-type:@robhan-cdk-lib/aws_grafana.Workspace.samlConfigurationStatus
+changed-type:@robhan-cdk-lib/aws_grafana.Workspace.ssoClientId
+changed-type:@robhan-cdk-lib/aws_grafana.Workspace.status

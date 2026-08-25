@@ -1,17 +1,24 @@
-import { Stack } from 'aws-cdk-lib';
-import { GatewayVpcEndpoint, GatewayVpcEndpointAwsService, PrefixList, SecurityGroup, Subnet, Vpc, VpcEndpoint } from 'aws-cdk-lib/aws-ec2';
+import { ArnFormat, Fn, Lazy, Stack, Tags, Token } from 'aws-cdk-lib';
+import { Match, Template } from 'aws-cdk-lib/assertions';
+import {
+  GatewayVpcEndpoint,
+  GatewayVpcEndpointAwsService,
+  IPrefixList,
+  ISecurityGroup,
+  ISubnet,
+  IVpcEndpoint,
+  PrefixList,
+  SecurityGroup,
+  Subnet,
+  Vpc,
+} from 'aws-cdk-lib/aws-ec2';
 import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import {
   AccountAccessType,
   AuthenticationProviders,
-  NetworkAccessControl,
+  IWorkspace,
   NotificationDestinations,
   PermissionTypes,
-  SamlAssertionAttributes,
-  SamlConfiguration,
-  SamlIdpMetadata,
-  SamlRoleValues,
-  VpcConfiguration,
   Workspace,
   WorkspaceProps,
 } from '../src';
@@ -20,33 +27,81 @@ let stack: Stack;
 let role: Role;
 let vpc: Vpc;
 
-
 beforeEach(() => {
-  stack = new Stack(undefined, undefined, { env: { account: '123456789012', region: 'us-east-1' } });
+  stack = new Stack(undefined, undefined, {
+    env: { account: '123456789012', region: 'us-east-1' },
+  });
   role = new Role(stack, 'GrafanaWorkspaceRole', {
     assumedBy: new ServicePrincipal('grafana.amazonaws.com'),
     description: 'Role for Amazon Managed Grafana Workspace',
   });
-  vpc = new Vpc(stack, 'vpc');
+  vpc = new Vpc(stack, 'Vpc');
 });
+
+/**
+ * Minimal set of required props for a workspace, layered on top of a `role`. Individual tests
+ * spread additional properties on top of this base.
+ */
+function baseProps(): WorkspaceProps {
+  return {
+    accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
+    authenticationProviders: [AuthenticationProviders.AWS_SSO],
+    permissionType: PermissionTypes.CUSTOMER_MANAGED,
+    role,
+  };
+}
+
+function makeSecurityGroups(count: number): ISecurityGroup[] {
+  return Array.from({ length: count }, (_, i) => new SecurityGroup(stack, `Sg${i}`, { vpc }));
+}
+
+function makeSubnets(count: number): ISubnet[] {
+  return Array.from({ length: count }, (_, i) =>
+    new Subnet(stack, `Subnet${i}`, {
+      availabilityZone: vpc.availabilityZones[0],
+      cidrBlock: `10.1.${i}.0/24`,
+      vpcId: vpc.vpcId,
+    }),
+  );
+}
+
+function makePrefixLists(count: number): IPrefixList[] {
+  return Array.from({ length: count }, (_, i) => new PrefixList(stack, `Pl${i}`));
+}
+
+function makeVpcEndpoints(count: number): IVpcEndpoint[] {
+  return Array.from({ length: count }, (_, i) =>
+    new GatewayVpcEndpoint(stack, `Vpce${i}`, {
+      service: GatewayVpcEndpointAwsService.DYNAMODB,
+      vpc,
+    }),
+  );
+}
 
 describe('Workspace', () => {
   describe('constructor', () => {
-    test('should create a new workspace', () => {
-      const workspace = new Workspace(stack, 'Workspace', {
+    test('creates a workspace with a full set of properties', () => {
+      // GIVEN
+      const securityGroup = new SecurityGroup(stack, 'Sg', { vpc });
+
+      // WHEN
+      new Workspace(stack, 'Workspace', {
         accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-        authenticationProviders: [AuthenticationProviders.AWS_SSO],
+        authenticationProviders: [AuthenticationProviders.AWS_SSO, AuthenticationProviders.SAML],
         permissionType: PermissionTypes.CUSTOMER_MANAGED,
         clientToken: 'testtoken',
+        dataSources: ['CLOUDWATCH', 'PROMETHEUS'],
         description: 'my Grafana workspace',
         grafanaVersion: '10.4',
         name: 'myWorkspace',
         notificationDestinations: [NotificationDestinations.SNS],
+        organizationRoleName: 'GrafanaOrgRole',
         pluginAdminEnabled: true,
+        stackSetName: 'my-stack-set',
         role,
         samlConfiguration: {
           allowedOrganizations: ['org1', 'org2'],
-          assertionAtrributes: {
+          assertionAttributes: {
             email: 'email',
             groups: 'groups',
             login: 'login',
@@ -65,1024 +120,677 @@ describe('Workspace', () => {
           },
         },
         vpcConfiguration: {
-          securityGroups: [new SecurityGroup(stack, 'sg', {
-            vpc,
-          })],
+          securityGroups: [securityGroup],
           subnets: vpc.privateSubnets,
         },
       });
 
-      expect(workspace).toBeDefined();
+      // THEN
+      const template = Template.fromStack(stack);
+      template.resourceCountIs('AWS::Grafana::Workspace', 1);
+      template.hasResourceProperties('AWS::Grafana::Workspace', {
+        AccountAccessType: 'CURRENT_ACCOUNT',
+        AuthenticationProviders: ['AWS_SSO', 'SAML'],
+        PermissionType: 'CUSTOMER_MANAGED',
+        ClientToken: 'testtoken',
+        DataSources: ['CLOUDWATCH', 'PROMETHEUS'],
+        Description: 'my Grafana workspace',
+        GrafanaVersion: '10.4',
+        Name: 'myWorkspace',
+        NotificationDestinations: ['SNS'],
+        OrganizationRoleName: 'GrafanaOrgRole',
+        PluginAdminEnabled: true,
+        StackSetName: 'my-stack-set',
+        SamlConfiguration: {
+          AllowedOrganizations: ['org1', 'org2'],
+          AssertionAttributes: {
+            Email: 'email',
+            Groups: 'groups',
+            Login: 'login',
+            Name: 'name',
+            Org: 'org',
+            Role: 'role',
+          },
+          IdpMetadata: {
+            Url: 'https://example.com',
+            Xml: '<xml></xml>',
+          },
+          LoginValidityDuration: 42,
+          RoleValues: {
+            Admin: ['adm1', 'adm2'],
+            Editor: ['edt1', 'edt2'],
+          },
+        },
+      });
     });
 
-    test('should create a new workspace with minimal parameters', () => {
-      const workspace = new Workspace(stack, 'Workspace', {
+    test('creates a workspace with the minimal set of required properties', () => {
+      // GIVEN / WHEN
+      new Workspace(stack, 'Workspace', {
         accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
         authenticationProviders: [AuthenticationProviders.AWS_SSO],
         permissionType: PermissionTypes.CUSTOMER_MANAGED,
         role,
       });
 
-      expect(workspace).toBeDefined();
+      // THEN
+      const template = Template.fromStack(stack);
+      template.resourceCountIs('AWS::Grafana::Workspace', 1);
+      template.hasResourceProperties('AWS::Grafana::Workspace', {
+        AccountAccessType: 'CURRENT_ACCOUNT',
+        AuthenticationProviders: ['AWS_SSO'],
+        PermissionType: 'CUSTOMER_MANAGED',
+      });
+      // No tags are rendered when none are supplied.
+      template.hasResourceProperties('AWS::Grafana::Workspace', Match.not(Match.objectLike({
+        Tags: Match.anyValue(),
+      })));
     });
 
-    test('should fail if props is not an object', () => {
-      try {
-        new Workspace(stack, 'Workspace', 1 as unknown as WorkspaceProps);
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('Props is not an object');
-      }
+    test('wires the workspace role ARN through to RoleArn', () => {
+      // GIVEN / WHEN
+      new Workspace(stack, 'Workspace', baseProps());
+
+      // THEN
+      const template = Template.fromStack(stack);
+      template.hasResourceProperties('AWS::Grafana::Workspace', {
+        RoleArn: stack.resolve(role.roleArn),
+      });
     });
 
-    test('should fail if role is missing for accountAccessType CURRENT_ACCOUNT', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
+    test('does not render optional properties that were not supplied', () => {
+      // GIVEN / WHEN
+      new Workspace(stack, 'Workspace', baseProps());
+
+      // THEN
+      const template = Template.fromStack(stack);
+      template.hasResourceProperties('AWS::Grafana::Workspace', Match.not(Match.objectLike({
+        SamlConfiguration: Match.anyValue(),
+      })));
+      template.hasResourceProperties('AWS::Grafana::Workspace', Match.not(Match.objectLike({
+        VpcConfiguration: Match.anyValue(),
+      })));
+    });
+
+    test('synthesizes without throwing for a tokenized or over-long name', () => {
+      // GIVEN
+      // Schema-shaped constraints (length, pattern) are deferred to CloudFormation's
+      // pre-deployment validation and must not throw at synth time. Tokenized values are
+      // unresolved at synth, so a construct-level length/regex check would be token-unsafe.
+
+      // WHEN / THEN
+      expect(() => {
+        new Workspace(stack, 'TokenNameWorkspace', {
+          ...baseProps(),
+          name: Lazy.string({ produce: () => 'resolved-name' }),
         });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('Role must be provided when accountAccessType is CURRENT_ACCOUNT');
-      }
-    });
-
-    test('should fail if clientToken is not a string', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          clientToken: 1 as unknown as string,
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('clientToken: must be a string');
-      }
-    });
-
-    test('should fail if clientToken is not within the permitted length', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          clientToken: 'r'.repeat(65),
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('clientToken: must be at most 64 characters long');
-      }
-    });
-
-    test('should fail if clientToken contains non-printable characters', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          clientToken: String.fromCharCode(0, 1, 2, 3, 4, 10, 13, 27),
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('clientToken: must contain only printable ASCII characters');
-      }
-    });
-
-    test('should fail if description is not a string', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          description: 1 as unknown as string,
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('description: must be a string');
-      }
-    });
-
-    test('should fail if description is longer than 2048 characters', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          description: 'r'.repeat(2049),
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('description: must be at most 2048 characters long');
-      }
-    });
-
-    test('should fail if grafanaVersion is not a string', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          grafanaVersion: 1 as unknown as string,
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('grafanaVersion: must be a string');
-      }
-    });
-
-    test('should fail if grafanaVersion is empty', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          grafanaVersion: '',
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('grafanaVersion: must be at least 1 character long');
-      }
-    });
-
-    test('should fail if grafanaVersion exceeds 255 characters', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          grafanaVersion: 'r'.repeat(256),
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('grafanaVersion: must be at most 255 characters long');
-      }
-    });
-
-    test('should fail if name is not a string', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          name: 1 as unknown as string,
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('name: must be a string');
-      }
-    });
-
-    test('should fail if name is not within the allowed length', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
+        new Workspace(stack, 'LongNameWorkspace', {
+          ...baseProps(),
           name: 'r'.repeat(256),
         });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('name: must be at most 255 characters long');
-      }
+        Template.fromStack(stack);
+      }).not.toThrow();
     });
+  });
 
-    test('should fail if name contains forbidden characters', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
+  describe('accountAccessType and permissionType variants', () => {
+    interface Variant {
+      readonly label: string;
+      readonly props: () => WorkspaceProps;
+      readonly expected: Record<string, unknown>;
+    }
+
+    const variants: Variant[] = [
+      {
+        label: 'CURRENT_ACCOUNT with a role',
+        props: () => ({
           accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
           authenticationProviders: [AuthenticationProviders.AWS_SSO],
           permissionType: PermissionTypes.CUSTOMER_MANAGED,
           role,
-          name: '%',
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('name: can only contain alphanumeric characters, hyphens, dots, underscores, and tildes');
-      }
-    });
-
-    test('should fail if networkAccessControl is not an object', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
+        }),
+        expected: {
+          AccountAccessType: 'CURRENT_ACCOUNT',
+          PermissionType: 'CUSTOMER_MANAGED',
+        },
+      },
+      {
+        label: 'ORGANIZATION with organizationalUnits and organizationRoleName',
+        props: () => ({
+          accountAccessType: AccountAccessType.ORGANIZATION,
           authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          networkAccessControl: 1 as unknown as NetworkAccessControl,
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('networkAccessControl: must be an object');
-      }
+          permissionType: PermissionTypes.SERVICE_MANAGED,
+          organizationalUnits: ['ou-abcd-12345678'],
+          organizationRoleName: 'GrafanaOrgRole',
+        }),
+        expected: {
+          AccountAccessType: 'ORGANIZATION',
+          PermissionType: 'SERVICE_MANAGED',
+          OrganizationalUnits: ['ou-abcd-12345678'],
+          OrganizationRoleName: 'GrafanaOrgRole',
+        },
+      },
+    ];
+
+    test.each(variants.map((v) => [v.label, v] as const))('%s', (_label, variant) => {
+      // GIVEN / WHEN
+      new Workspace(stack, 'Workspace', variant.props());
+
+      // THEN
+      const template = Template.fromStack(stack);
+      template.resourceCountIs('AWS::Grafana::Workspace', 1);
+      template.hasResourceProperties('AWS::Grafana::Workspace', variant.expected);
     });
+  });
 
-    test('should fail if networkAccessControl.prefixLists is not an array', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          networkAccessControl: {
-            prefixLists: 1 as unknown as PrefixList[],
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('networkAccessControl: prefixLists must be an array');
-      }
-    });
+  describe('authenticationProviders', () => {
+    const cases: ReadonlyArray<readonly [string, AuthenticationProviders[]]> = [
+      ['AWS_SSO', [AuthenticationProviders.AWS_SSO]],
+      ['SAML', [AuthenticationProviders.SAML]],
+      ['AWS_SSO and SAML', [AuthenticationProviders.AWS_SSO, AuthenticationProviders.SAML]],
+    ];
 
-    test('should fail if networkAccessControl.prefixLists has more than 5 members', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          networkAccessControl: {
-            prefixLists: Array.from({ length: 6 }, (_, i) =>
-              new PrefixList(stack, `prefix${i}`),
-            ),
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('networkAccessControl: prefixLists must have at most 5 elements');
-      }
-    });
-
-    test('should fail if networkAccessControl.vpcEndpoints is not an array', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          networkAccessControl: {
-            vpcEndpoints: 1 as unknown as VpcEndpoint[],
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('networkAccessControl: vpcEndpoints must be an array');
-      }
-    });
-
-    test('should fail if networkAccessControl.vpcEndpoints has more than 5 members', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          networkAccessControl: {
-            vpcEndpoints: Array.from({ length: 6 }, (_, i) =>
-              new GatewayVpcEndpoint(stack, `vpcEndpoint${i}`, {
-                service: GatewayVpcEndpointAwsService.DYNAMODB,
-                vpc,
-              }),
-            ),
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('networkAccessControl: vpcEndpoints must have at most 5 elements');
-      }
-    });
-
-    test('should fail if organizationRoleName is not a string', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          organizationRoleName: 1 as unknown as string,
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('organizationRoleName: must be a string');
-      }
-    });
-
-    test('should fail if organizationRoleName is an empty string', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          organizationRoleName: '',
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('organizationRoleName: must be at least 1 character long');
-      }
-    });
-
-    test('should fail if organizationRoleName exceeds max allowed length', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          organizationRoleName: 'r'.repeat(2049),
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('organizationRoleName: must be at most 2048 characters long');
-      }
-    });
-
-    test('should fail if samlConfiguration is not an object', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: 1 as unknown as SamlConfiguration,
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: must be an object');
-      }
-    });
-
-    test('should fail if SAML assertionAttributes is not an object', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            assertionAtrributes: 1 as unknown as SamlAssertionAttributes,
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: assertionAtrributes: must be an object');
-      }
-    });
-
-    test('should fail if SAML assertionAttribute is not a string', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            assertionAtrributes: {
-              email: 1 as unknown as string,
-            },
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain("samlConfiguration: assertionAtrributes: Property 'email' must be a string");
-      }
-    });
-
-    test('should fail if SAML assertionAttribute is an empty string', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            assertionAtrributes: {
-              email: '',
-              groups: undefined,
-            },
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain("samlConfiguration: assertionAtrributes: Property 'email' must be at least 1 character long");
-      }
-    });
-
-    test('should fail if SAML assertionAttribute is more than 256 characters', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            assertionAtrributes: {
-              email: 'r'.repeat(257),
-            },
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain("samlConfiguration: assertionAtrributes: Property 'email' must be at most 256 characters long");
-      }
-    });
-
-    test('should fail if SAML idpMetadata is not an object', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: 1 as unknown as SamlIdpMetadata,
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: idpMetadata: must be an object');
-      }
-    });
-
-    test('should fail if SAML idpMetadata.url is not a string', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {
-              url: 1 as unknown as string,
-            },
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain("Property 'url' must be a string");
-      }
-    });
-
-    test('should fail if SAML idpMetadata.url is an empty string', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {
-              url: '',
-            },
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain("samlConfiguration: idpMetadata: Property 'url' must be at least 1 character long");
-      }
-    });
-
-    test('should fail if SAML idpMetadata.url exceeds maximum length', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {
-              url: 'r'.repeat(2049),
-            },
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain("samlConfiguration: idpMetadata: Property 'url' must be at most 2048 characters long");
-      }
-    });
-
-    test('should fail if SAML idpMetadata.xml is not a string', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {
-              xml: 1 as unknown as string,
-            },
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain("Property 'xml' must be a string");
-      }
-    });
-
-    test('should fail if SAML idpMetadata is missing', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-
-          } as unknown as SamlConfiguration,
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: idpMetadata is required in samlConfiguration');
-      }
-    });
-
-    test('should fail if SAML allowedOrganizations is not an array', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            allowedOrganizations: 1 as unknown as string[],
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: allowedOrganizations must be an array');
-      }
-    });
-
-    test('should fail if SAML allowedOrganizations has no elements', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            allowedOrganizations: [],
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: allowedOrganizations must have at least 1 element');
-      }
-    });
-
-    test('should fail if SAML allowedOrganizations has more than 256 elements', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            allowedOrganizations: Array(257).fill('r'),
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: allowedOrganizations must have at most 256 elements');
-      }
-    });
-
-    test('should fail if SAML allowedOrganizations has a non-string member', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            allowedOrganizations: ['r', 42] as unknown as string[],
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: allowedOrganizations[1] must be a string');
-      }
-    });
-
-    test('should fail if SAML loginValidityDuration is not a number', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            loginValidityDuration: 'r' as unknown as number,
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: loginValidityDuration must be a number');
-      }
-    });
-
-    test('should fail if SAML loginValidityDuration is a negative number', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            loginValidityDuration: -42,
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: loginValidityDuration must be at least 1');
-      }
-    });
-
-    test('should fail if SAML roleValues is not an object', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            roleValues: 1 as unknown as SamlRoleValues,
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: roleValues must be an object');
-      }
-    });
-
-    test('should fail if SAML roleValues.admin is not an array', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            roleValues: {
-              admin: 1 as unknown as string[],
-            },
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: roleValues.admin must be an array');
-      }
-    });
-
-    test('should fail if SAML roleValues.admin has a non-string member', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            roleValues: {
-              admin: ['r', 42] as unknown as string[],
-            },
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: roleValues.admin[1] must be a string');
-      }
-    });
-
-    test('should fail if SAML roleValues.admin has more than 256 members', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            roleValues: {
-              admin: Array(257).fill('r'),
-            },
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: roleValues.admin must have at most 256 elements');
-      }
-    });
-
-    test('should fail if SAML roleValues.editor is not an array', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            roleValues: {
-              editor: 1 as unknown as string[],
-            },
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: roleValues.editor must be an array');
-      }
-    });
-
-    test('should fail if SAML roleValues.editor has a non-string member', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            roleValues: {
-              editor: ['r', 42] as unknown as string[],
-            },
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: roleValues.editor[1] must be a string');
-      }
-    });
-
-    test('should fail if SAML roleValues.editor has more than 256 members', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          samlConfiguration: {
-            idpMetadata: {},
-            roleValues: {
-              editor: Array(257).fill('r'),
-            },
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('samlConfiguration: roleValues.editor must have at most 256 elements');
-      }
-    });
-
-    test('should fail if vcpConfiguration is not an object', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          vpcConfiguration: 1 as unknown as VpcConfiguration,
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('vpcConfiguration: vpcConfiguration must be an object');
-      }
-    });
-
-    test('should fail if vcpConfiguration.securityGroups is missing', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          vpcConfiguration: {
-            subnets: Array.from({ length: 2 }, (_, i) =>
-              new Subnet(stack, `Subnet${i + 1}`, {
-                availabilityZone: vpc.availabilityZones[0],
-                cidrBlock: `10.1.${i}.0/24`,
-                vpcId: vpc.vpcId,
-              }),
-            ),
-          } as unknown as VpcConfiguration,
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('vpcConfiguration: securityGroups is required in vpcConfiguration');
-      }
-    });
-
-    test('should fail if vcpConfiguration.securityGroups is not an array', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          vpcConfiguration: {
-            securityGroups: 1 as unknown as SecurityGroup[],
-            subnets: Array.from({ length: 2 }, (_, i) =>
-              new Subnet(stack, `Subnet${i + 1}`, {
-                availabilityZone: vpc.availabilityZones[0],
-                cidrBlock: `10.1.${i}.0/24`,
-                vpcId: vpc.vpcId,
-              }),
-            ),
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('vpcConfiguration: securityGroups must be an array');
-      }
-    });
-
-    test('should fail if vcpConfiguration.securityGroups has less than 1 items', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          vpcConfiguration: {
-            securityGroups: [],
-            subnets: Array.from({ length: 2 }, (_, i) =>
-              new Subnet(stack, `Subnet${i + 1}`, {
-                availabilityZone: vpc.availabilityZones[0],
-                cidrBlock: `10.1.${i}.0/24`,
-                vpcId: vpc.vpcId,
-              }),
-            ),
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('vpcConfiguration: securityGroups must have at least 1 element');
-      }
-    });
-
-    test('should fail if vcpConfiguration.securityGroups has more than 5 items', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          vpcConfiguration: {
-            securityGroups: Array.from({ length: 6 }, (_, i) =>
-              new SecurityGroup(stack, `SG${i + 1}`, {
-                vpc,
-              }),
-            ),
-            subnets: Array.from({ length: 2 }, (_, i) =>
-              new Subnet(stack, `Subnet${i + 1}`, {
-                availabilityZone: vpc.availabilityZones[0],
-                cidrBlock: `10.1.${i}.0/24`,
-                vpcId: vpc.vpcId,
-              }),
-            ),
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('vpcConfiguration: securityGroups must have at most 5 elements');
-      }
-    });
-
-    test('should fail if vcpConfiguration.subnets is missing', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          vpcConfiguration: {
-            ssecurityGroups: [new SecurityGroup(stack, 'sg', {
-              vpc,
-            })],
-          } as unknown as VpcConfiguration,
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('vpcConfiguration: subnets is required in vpcConfiguration');
-      }
-    });
-
-    test('should fail if vcpConfiguration.subnets is not an array', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          vpcConfiguration: {
-            securityGroups: [new SecurityGroup(stack, 'sg', {
-              vpc,
-            })],
-            subnets: 1 as unknown as Subnet[],
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('vpcConfiguration: subnets must be an array');
-      }
-    });
-
-    test('should fail if vcpConfiguration.subnets has less than 2 items', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          vpcConfiguration: {
-            securityGroups: [new SecurityGroup(stack, 'sg', {
-              vpc,
-            })],
-            subnets: [new Subnet(stack, 'subnet1', {
-              availabilityZone: vpc.availabilityZones[0],
-              cidrBlock: '10.1.0.0/24',
-              vpcId: vpc.vpcId,
-            })],
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('vpcConfiguration: subnets must have at least 2 elements');
-      }
-    });
-
-    test('should fail if vcpConfiguration.subnets has more than 6 items', () => {
-      try {
-        new Workspace(stack, 'Workspace', {
-          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-          authenticationProviders: [AuthenticationProviders.AWS_SSO],
-          permissionType: PermissionTypes.CUSTOMER_MANAGED,
-          role,
-          vpcConfiguration: {
-            securityGroups: [new SecurityGroup(stack, 'sg', {
-              vpc,
-            })],
-            subnets: Array.from({ length: 7 }, (_, i) =>
-              new Subnet(stack, `Subnet${i + 1}`, {
-                availabilityZone: vpc.availabilityZones[0],
-                cidrBlock: `10.1.${i}.0/24`,
-                vpcId: vpc.vpcId,
-              }),
-            ),
-          },
-        });
-        throw new Error('Expected error was not thrown');
-      } catch (e: any) {
-        expect(e.message).toContain('vpcConfiguration: subnets must have at most 6 elements');
-      }
-    });
-
-    test('should import from workspaceArn', () => {
-      const workspaceArn = `arn:${stack.partition}:grafana:${stack.region}:${stack.account}:workspaces/workspace-id`;
-      const workspace = Workspace.fromWorkspaceAttributes(stack, 'Workspace', {
-        accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-        authenticationProviders: [AuthenticationProviders.AWS_SSO],
-        permissionType: PermissionTypes.CUSTOMER_MANAGED,
-        workspaceArn,
+    test.each(cases)('renders %s', (_label, providers) => {
+      // GIVEN / WHEN
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        authenticationProviders: providers,
       });
-      expect(workspace.workspaceId).toEqual('workspace-id');
-      expect(workspace.workspaceArn).toEqual(workspaceArn);
+
+      // THEN
+      Template.fromStack(stack).hasResourceProperties('AWS::Grafana::Workspace', {
+        AuthenticationProviders: providers,
+      });
+    });
+  });
+
+  describe('optional scalar and list properties', () => {
+    test('renders notificationDestinations', () => {
+      // GIVEN / WHEN
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        notificationDestinations: [NotificationDestinations.SNS],
+      });
+
+      // THEN
+      Template.fromStack(stack).hasResourceProperties('AWS::Grafana::Workspace', {
+        NotificationDestinations: ['SNS'],
+      });
+    });
+
+    test('renders dataSources', () => {
+      // GIVEN / WHEN
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        dataSources: ['CLOUDWATCH', 'PROMETHEUS'],
+      });
+
+      // THEN
+      Template.fromStack(stack).hasResourceProperties('AWS::Grafana::Workspace', {
+        DataSources: ['CLOUDWATCH', 'PROMETHEUS'],
+      });
+    });
+
+    test('renders pluginAdminEnabled', () => {
+      // GIVEN / WHEN
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        pluginAdminEnabled: true,
+      });
+
+      // THEN
+      Template.fromStack(stack).hasResourceProperties('AWS::Grafana::Workspace', {
+        PluginAdminEnabled: true,
+      });
+    });
+
+    test('renders clientToken, description, grafanaVersion, name and stackSetName', () => {
+      // GIVEN / WHEN
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        clientToken: 'a-valid-token_123',
+        description: 'A Grafana workspace',
+        grafanaVersion: '10.4',
+        name: 'my-workspace_1.0~test',
+        stackSetName: 'my-stack-set',
+      });
+
+      // THEN
+      Template.fromStack(stack).hasResourceProperties('AWS::Grafana::Workspace', {
+        ClientToken: 'a-valid-token_123',
+        Description: 'A Grafana workspace',
+        GrafanaVersion: '10.4',
+        Name: 'my-workspace_1.0~test',
+        StackSetName: 'my-stack-set',
+      });
+    });
+  });
+
+  describe('samlConfiguration', () => {
+    test('renders a minimal SAML configuration (idpMetadata only)', () => {
+      // GIVEN / WHEN
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        authenticationProviders: [AuthenticationProviders.SAML],
+        samlConfiguration: {
+          idpMetadata: { url: 'https://example.com/metadata' },
+        },
+      });
+
+      // THEN
+      Template.fromStack(stack).hasResourceProperties('AWS::Grafana::Workspace', {
+        SamlConfiguration: {
+          IdpMetadata: { Url: 'https://example.com/metadata' },
+        },
+      });
+    });
+
+    test('renders a full SAML configuration', () => {
+      // GIVEN / WHEN
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        authenticationProviders: [AuthenticationProviders.SAML],
+        samlConfiguration: {
+          allowedOrganizations: ['org1', 'org2'],
+          assertionAttributes: {
+            email: 'email',
+            groups: 'groups',
+            login: 'login',
+            name: 'name',
+            org: 'org',
+            role: 'role',
+          },
+          idpMetadata: {
+            url: 'https://example.com/metadata',
+            xml: '<xml></xml>',
+          },
+          loginValidityDuration: 42,
+          roleValues: {
+            admin: ['adm1', 'adm2'],
+            editor: ['edt1', 'edt2'],
+          },
+        },
+      });
+
+      // THEN
+      Template.fromStack(stack).hasResourceProperties('AWS::Grafana::Workspace', {
+        SamlConfiguration: {
+          AllowedOrganizations: ['org1', 'org2'],
+          AssertionAttributes: {
+            Email: 'email',
+            Groups: 'groups',
+            Login: 'login',
+            Name: 'name',
+            Org: 'org',
+            Role: 'role',
+          },
+          IdpMetadata: {
+            Url: 'https://example.com/metadata',
+            Xml: '<xml></xml>',
+          },
+          LoginValidityDuration: 42,
+          RoleValues: {
+            Admin: ['adm1', 'adm2'],
+            Editor: ['edt1', 'edt2'],
+          },
+        },
+      });
+    });
+
+    test('maps the correctly-spelled assertionAttributes onto the template', () => {
+      // GIVEN / WHEN
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        authenticationProviders: [AuthenticationProviders.SAML],
+        samlConfiguration: {
+          idpMetadata: { url: 'https://example.com' },
+          assertionAttributes: {
+            email: 'correct-email',
+          },
+        },
+      });
+
+      // THEN
+      Template.fromStack(stack).hasResourceProperties('AWS::Grafana::Workspace', {
+        SamlConfiguration: Match.objectLike({
+          AssertionAttributes: {
+            Email: 'correct-email',
+          },
+        }),
+      });
+    });
+  });
+
+  describe('vpcConfiguration', () => {
+    const cases: ReadonlyArray<readonly [string, number, number]> = [
+      ['minimum bounds (1 security group, 2 subnets)', 1, 2],
+      ['maximum bounds (5 security groups, 6 subnets)', 5, 6],
+    ];
+
+    test.each(cases)('renders %s', (_label, sgCount, subnetCount) => {
+      // GIVEN
+      const securityGroups = makeSecurityGroups(sgCount);
+      const subnets = makeSubnets(subnetCount);
+
+      // WHEN
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        vpcConfiguration: { securityGroups, subnets },
+      });
+
+      // THEN
+      const template = Template.fromStack(stack);
+      template.resourceCountIs('AWS::Grafana::Workspace', 1);
+      // Security group and subnet ids resolve to CloudFormation tokens (Ref/GetAtt), so assert the
+      // shape and cardinality rather than concrete string ids.
+      template.hasResourceProperties('AWS::Grafana::Workspace', {
+        VpcConfiguration: {
+          SecurityGroupIds: Match.arrayWith(
+            securityGroups.map((sg) => stack.resolve(sg.securityGroupId)),
+          ),
+          SubnetIds: Match.arrayWith(subnets.map((s) => stack.resolve(s.subnetId))),
+        },
+      });
+    });
+  });
+
+  describe('networkAccessControl', () => {
+    test('renders prefixLists as PrefixListIds', () => {
+      // GIVEN
+      const prefixLists = makePrefixLists(2);
+
+      // WHEN
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        networkAccessControl: { prefixLists },
+      });
+
+      // THEN
+      Template.fromStack(stack).hasResourceProperties('AWS::Grafana::Workspace', {
+        NetworkAccessControl: {
+          PrefixListIds: prefixLists.map((pl) => stack.resolve(pl.prefixListId)),
+          // No VPC endpoints supplied, so VpceIds is not rendered.
+          VpceIds: Match.absent(),
+        },
+      });
+    });
+
+    test('renders vpcEndpoints as VpceIds', () => {
+      // GIVEN
+      const vpcEndpoints = makeVpcEndpoints(2);
+
+      // WHEN
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        networkAccessControl: { vpcEndpoints },
+      });
+
+      // THEN
+      Template.fromStack(stack).hasResourceProperties('AWS::Grafana::Workspace', {
+        NetworkAccessControl: {
+          PrefixListIds: Match.absent(),
+          VpceIds: vpcEndpoints.map((ve) => stack.resolve(ve.vpcEndpointId)),
+        },
+      });
+    });
+
+    test('renders both prefixLists and vpcEndpoints', () => {
+      // GIVEN
+      const prefixLists = makePrefixLists(2);
+      const vpcEndpoints = makeVpcEndpoints(2);
+
+      // WHEN
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        networkAccessControl: { prefixLists, vpcEndpoints },
+      });
+
+      // THEN
+      Template.fromStack(stack).hasResourceProperties('AWS::Grafana::Workspace', {
+        NetworkAccessControl: {
+          PrefixListIds: prefixLists.map((pl) => stack.resolve(pl.prefixListId)),
+          VpceIds: vpcEndpoints.map((ve) => stack.resolve(ve.vpcEndpointId)),
+        },
+      });
+    });
+
+    test('preserves empty arrays as "allow none" (deny all traffic)', () => {
+      // GIVEN / WHEN
+      // Empty arrays are meaningful: they must survive to the template as empty lists rather than
+      // being dropped, so the workspace denies all traffic.
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        networkAccessControl: { prefixLists: [], vpcEndpoints: [] },
+      });
+
+      // THEN
+      Template.fromStack(stack).hasResourceProperties('AWS::Grafana::Workspace', {
+        NetworkAccessControl: {
+          PrefixListIds: [],
+          VpceIds: [],
+        },
+      });
+    });
+
+    test('renders an empty NetworkAccessControl for an empty configuration object', () => {
+      // GIVEN / WHEN
+      // Neither prefixLists nor vpcEndpoints supplied: both sides map to undefined, so the
+      // rendered NetworkAccessControl is an empty object (no access restriction expressed).
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        networkAccessControl: {},
+      });
+
+      // THEN
+      Template.fromStack(stack).hasResourceProperties('AWS::Grafana::Workspace', {
+        NetworkAccessControl: {
+          PrefixListIds: Match.absent(),
+          VpceIds: Match.absent(),
+        },
+      });
+    });
+  });
+
+  describe('tags', () => {
+    test('renders tags supplied through props.tags', () => {
+      // GIVEN / WHEN
+      new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        tags: {
+          environment: 'test',
+          team: 'observability',
+        },
+      });
+
+      // THEN
+      const template = Template.fromStack(stack);
+      template.hasResourceProperties('AWS::Grafana::Workspace', {
+        Tags: Match.arrayWith([
+          { Key: 'environment', Value: 'test' },
+          { Key: 'team', Value: 'observability' },
+        ]),
+      });
+    });
+
+    test('propagates tags added via Tags.of(workspace).add()', () => {
+      // GIVEN
+      const workspace = new Workspace(stack, 'Workspace', baseProps());
+
+      // WHEN
+      Tags.of(workspace).add('costCenter', '1234');
+
+      // THEN
+      const template = Template.fromStack(stack);
+      template.hasResourceProperties('AWS::Grafana::Workspace', {
+        Tags: Match.arrayWith([{ Key: 'costCenter', Value: '1234' }]),
+      });
+    });
+
+    test('combines tags from props.tags and Tags.of()', () => {
+      // GIVEN
+      const workspace = new Workspace(stack, 'Workspace', {
+        ...baseProps(),
+        tags: { environment: 'test' },
+      });
+
+      // WHEN
+      Tags.of(workspace).add('costCenter', '1234');
+
+      // THEN
+      // Assert each tag independently: Match.arrayWith matches patterns as an ordered
+      // subsequence, so checking them separately avoids coupling to the render order.
+      const template = Template.fromStack(stack);
+      template.hasResourceProperties('AWS::Grafana::Workspace', {
+        Tags: Match.arrayWith([{ Key: 'environment', Value: 'test' }]),
+      });
+      template.hasResourceProperties('AWS::Grafana::Workspace', {
+        Tags: Match.arrayWith([{ Key: 'costCenter', Value: '1234' }]),
+      });
+    });
+  });
+
+  describe('CloudFormation attribute getters', () => {
+    test('an owned workspace exposes attributes as unresolved tokens', () => {
+      // GIVEN / WHEN
+      const workspace = new Workspace(stack, 'Workspace', baseProps());
+
+      // THEN
+      Template.fromStack(stack).resourceCountIs('AWS::Grafana::Workspace', 1);
+
+      const tokenAttrs: ReadonlyArray<readonly [string, string | undefined]> = [
+        ['workspaceId', workspace.workspaceId],
+        ['endpoint', workspace.endpoint],
+        ['status', workspace.status],
+        ['samlConfigurationStatus', workspace.samlConfigurationStatus],
+        ['ssoClientId', workspace.ssoClientId],
+        ['creationTimestamp', workspace.creationTimestamp],
+        ['modificationTimestamp', workspace.modificationTimestamp],
+        ['grafanaVersion', workspace.grafanaVersion],
+      ];
+      for (const [, value] of tokenAttrs) {
+        expect(value).toBeDefined();
+        expect(Token.isUnresolved(value)).toBe(true);
+      }
+    });
+
+    test('workspaceArn is an unresolved token that resolves to the expected ARN shape', () => {
+      // GIVEN / WHEN
+      const workspace = new Workspace(stack, 'Workspace', baseProps());
+
+      // THEN
+      expect(workspace.workspaceArn).toBeDefined();
+      expect(Token.isUnresolved(workspace.workspaceArn)).toBe(true);
+
+      const resolved = JSON.stringify(stack.resolve(workspace.workspaceArn));
+      expect(resolved).toContain(':grafana:');
+      expect(resolved).toContain('workspaces/');
+      expect(resolved).toContain('123456789012');
+      expect(resolved).toContain('us-east-1');
+    });
+  });
+
+  describe('import', () => {
+    describe('fromWorkspaceArn', () => {
+      test('round-trips a concrete ARN and parses the workspaceId', () => {
+        // GIVEN
+        const arn = 'arn:aws:grafana:us-east-1:123456789012:workspaces/g-abc123def4';
+
+        // WHEN
+        const imported = Workspace.fromWorkspaceArn(stack, 'Imported', arn);
+
+        // THEN
+        expect(imported.workspaceArn).toBe(arn);
+        expect(imported.workspaceId).toBe('g-abc123def4');
+        expect(Token.isUnresolved(imported.workspaceId)).toBe(false);
+      });
+
+      test('does not throw on a tokenized-id ARN and the ARN round-trips', () => {
+        // GIVEN
+        const tokenizedId = Fn.ref('SomeWorkspaceIdParam');
+        const arn = stack.formatArn({
+          service: 'grafana',
+          resource: 'workspaces',
+          resourceName: tokenizedId,
+          arnFormat: ArnFormat.SLASH_RESOURCE_NAME,
+        });
+
+        // WHEN
+        let imported!: IWorkspace;
+        expect(() => {
+          imported = Workspace.fromWorkspaceArn(stack, 'Imported', arn);
+        }).not.toThrow();
+
+        // THEN
+        expect(imported.workspaceArn).toBe(arn);
+        expect(Token.isUnresolved(imported.workspaceId)).toBe(true);
+      });
+
+      test('exposes no create-time configuration (identity-only import)', () => {
+        // GIVEN
+        const arn = 'arn:aws:grafana:us-east-1:123456789012:workspaces/g-idonly0001';
+
+        // WHEN
+        const imported = Workspace.fromWorkspaceArn(stack, 'Imported', arn);
+
+        // THEN
+        expect(imported.accountAccessType).toBeUndefined();
+        expect(imported.authenticationProviders).toBeUndefined();
+        expect(imported.permissionType).toBeUndefined();
+        expect(imported.endpoint).toBeUndefined();
+        expect(imported.status).toBeUndefined();
+      });
+
+      test('falls back to an empty workspaceId when the ARN has no resource name', () => {
+        // GIVEN
+        // An ARN whose `workspaces` resource carries no name segment: splitArn yields an undefined
+        // resourceName, which the construct maps to '' rather than throwing.
+        const arn = 'arn:aws:grafana:us-east-1:123456789012:workspaces';
+
+        // WHEN
+        const imported = Workspace.fromWorkspaceArn(stack, 'Imported', arn);
+
+        // THEN
+        expect(imported.workspaceArn).toBe(arn);
+        expect(imported.workspaceId).toBe('');
+      });
+    });
+
+    describe('fromWorkspaceAttributes', () => {
+      test('parses the workspaceId from the ARN and retains supplied attributes', () => {
+        // GIVEN
+        const workspaceArn =
+          `arn:${stack.partition}:grafana:${stack.region}:${stack.account}:workspaces/workspace-id`;
+
+        // WHEN
+        const imported = Workspace.fromWorkspaceAttributes(stack, 'Imported', {
+          accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
+          authenticationProviders: [AuthenticationProviders.AWS_SSO],
+          permissionType: PermissionTypes.CUSTOMER_MANAGED,
+          workspaceArn,
+        });
+
+        // THEN
+        expect(imported.workspaceId).toEqual('workspace-id');
+        expect(imported.workspaceArn).toEqual(workspaceArn);
+        expect(imported.accountAccessType).toEqual(AccountAccessType.CURRENT_ACCOUNT);
+        expect(imported.authenticationProviders).toEqual([AuthenticationProviders.AWS_SSO]);
+        expect(imported.permissionType).toEqual(PermissionTypes.CUSTOMER_MANAGED);
+      });
     });
   });
 
   describe('isWorkspace', () => {
-    test('should return true for workspace', () => {
-      const workspace = new Workspace(stack, 'Workspace', {
-        accountAccessType: AccountAccessType.CURRENT_ACCOUNT,
-        authenticationProviders: [AuthenticationProviders.AWS_SSO],
-        permissionType: PermissionTypes.CUSTOMER_MANAGED,
-        role,
-      });
+    test('returns true for a Workspace instance', () => {
+      // GIVEN
+      const workspace = new Workspace(stack, 'Workspace', baseProps());
+
+      // WHEN / THEN
       expect(Workspace.isWorkspace(workspace)).toBe(true);
+    });
+
+    test('returns false for a non-Workspace object', () => {
+      // GIVEN / WHEN / THEN
+      expect(Workspace.isWorkspace({})).toBe(false);
     });
   });
 });

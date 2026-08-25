@@ -432,7 +432,7 @@
             "--peer",
             "--no-deprecated",
             "--dep=dev,prod,peer,optional",
-            "--filter=@types/jest,@types/node,eslint-import-resolver-typescript,eslint-plugin-import,jest,jsii-diff,jsii-pacmak,projen,ts-jest,ts-node,typescript,@robhan-cdk-lib/utils"
+            "--filter=@types/jest,@types/node,eslint-import-resolver-typescript,eslint-plugin-import,jest,jsii-diff,jsii-pacmak,projen,ts-jest,ts-node,typescript"
           ]
         },
         {
@@ -442,6 +442,7 @@
           "execArgs": [
             "yarn",
             "upgrade",
+            "@aws-cdk/integ-tests-alpha",
             "@stylistic/eslint-plugin",
             "@types/jest",
             "@types/node",
@@ -463,8 +464,7 @@
             "ts-node",
             "typescript",
             "aws-cdk-lib",
-            "constructs",
-            "@robhan-cdk-lib/utils"
+            "constructs"
           ]
         },
         {

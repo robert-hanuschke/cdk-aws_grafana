@@ -1,0 +1,15 @@
+{
+  "version": "54.0.0",
+  "testCases": {
+    "grafana-workspace-integ/DefaultTest": {
+      "stacks": [
+        "grafana-workspace-minimal-integ",
+        "grafana-workspace-network-integ"
+      ],
+      "assertionStack": "grafana-workspace-integ/DefaultTest/DeployAssert",
+      "assertionStackName": "grafanaworkspaceintegDefaultTestDeployAssert109D82EA"
+    }
+  },
+  "enableLookups": true,
+  "minimumCliVersion": "2.1138.0"
+}
