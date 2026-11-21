@@ -4,6 +4,8 @@
 
 ### Workspace <a name="Workspace" id="@robhan-cdk-lib/aws_grafana.Workspace"></a>
 
+- *Implements:* constructs.IConstruct, constructs.IDependable, aws-cdk-lib.IResource, aws-cdk-lib.interfaces.IEnvironmentAware, <a href="#@robhan-cdk-lib/aws_grafana.IWorkspace">IWorkspace</a>
+
 Specifies a workspace.
 
 In a workspace, you can create Grafana dashboards and visualizations to
@@ -694,7 +696,7 @@ The configuration settings for an Amazon VPC that contains data sources for your
 
 ### WorkspaceBase <a name="WorkspaceBase" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase"></a>
 
-- *Implements:* <a href="#@robhan-cdk-lib/aws_grafana.IWorkspace">IWorkspace</a>
+- *Implements:* constructs.IConstruct, constructs.IDependable, aws-cdk-lib.IResource, aws-cdk-lib.interfaces.IEnvironmentAware, <a href="#@robhan-cdk-lib/aws_grafana.IWorkspace">IWorkspace</a>
 
 #### Initializers <a name="Initializers" id="@robhan-cdk-lib/aws_grafana.WorkspaceBase.Initializer"></a>
 
